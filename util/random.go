@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"math/big"
 	"math/rand"
 	"strings"
 
@@ -72,4 +73,12 @@ func RandomDecimal(n int, point int) (decimal.Decimal, error) {
 		de = decimal.NewFromInt(RandomInt64(1, 10000))
 	}
 	return de, err
+}
+
+func RandomNumeric() pgtype.Numeric {
+	return pgtype.Numeric{
+		Int:    big.NewInt(rand.Int63()),
+		Exp:    rand.Intn(10), // 隨機小數位數
+		Status: pgtype.Present,
+	}
 }
