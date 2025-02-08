@@ -1,0 +1,108 @@
+{
+  "rabbit_version": "3.12.0",
+  "users": [
+    {
+      "name": "stock_ana_mq",
+      "password": "",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "stock_ana_mq",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+        "name": "data_processer",     
+        "vhost": "/",            
+        "type": "direct",       
+        "durable": true,        
+        "auto_delete": false,    
+        "internal": false,       
+        "arguments": {}         
+    },
+    {
+      "name": "system_logs",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "pre_process_stock_data",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "back_testing",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "full_backtest",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "local_file_logs",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "data_processer",
+      "vhost": "/",
+      "destination": "pre_process_stock_data",
+      "destination_type": "queue",
+      "routing_key": "stock.pricetable",
+      "arguments": {}
+    },
+    {
+      "source": "data_processer",
+      "vhost": "/",
+      "destination": "back_testing",
+      "destination_type": "queue",
+      "routing_key": "backtesting",
+      "arguments": {}
+    },
+    {
+      "source": "data_processer",
+      "vhost": "/",
+      "destination": "full_backtest",
+      "destination_type": "queue",
+      "routing_key": "full_backtest",
+      "arguments": {}
+    },
+    {
+      "source": "system_logs",
+      "vhost": "/",
+      "destination": "local_file_logs",
+      "destination_type": "queue",
+      "routing_key": "log.file.#",
+      "arguments": {}
+    }
+  ]
+}
