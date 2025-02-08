@@ -2,7 +2,10 @@ module github.com/RoyceAzure/rj/repo
 
 go 1.23.3
 
-require go.mongodb.org/mongo-driver v1.17.2
+require (
+	github.com/golang/mock v1.6.0
+	go.mongodb.org/mongo-driver v1.17.2
+)
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect

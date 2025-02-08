@@ -3,6 +3,7 @@ module github.com/RoyceAzure/rj/infra
 go 1.23.3
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/minio/minio-go/v7 v7.0.84
 	github.com/rabbitmq/amqp091-go v1.10.0
