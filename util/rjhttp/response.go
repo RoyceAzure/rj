@@ -1,4 +1,4 @@
-package response
+package rjhttp
 
 import (
 	"encoding/json"
