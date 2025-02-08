@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strings"
 
+	"github.com/jackc/pgtype"
 	"github.com/shopspring/decimal"
 )
 
@@ -78,7 +79,7 @@ func RandomDecimal(n int, point int) (decimal.Decimal, error) {
 func RandomNumeric() pgtype.Numeric {
 	return pgtype.Numeric{
 		Int:    big.NewInt(rand.Int63()),
-		Exp:    rand.Intn(10), // 隨機小數位數
+		Exp:    int32(rand.Intn(10)), // 隨機小數位數
 		Status: pgtype.Present,
 	}
 }

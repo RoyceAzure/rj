@@ -12,9 +12,12 @@ require (
 	google.golang.org/grpc v1.70.0
 )
 
+require github.com/jackc/pgio v1.0.0 // indirect
+
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jackc/pgtype v1.14.4
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect

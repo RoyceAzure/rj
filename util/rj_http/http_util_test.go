@@ -1,4 +1,4 @@
-package rjhttp
+package rj_http
 
 import (
 	"context"
