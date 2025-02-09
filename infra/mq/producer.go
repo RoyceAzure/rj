@@ -14,35 +14,35 @@ type IProducer interface {
 }
 
 type Producer struct {
-	conn    *amqp.Connection
-	channel *amqp.Channel
-	done    chan struct{}
+	channel   *amqp.Channel
+	channelId int
+	done      chan struct{}
 }
 
-func NewProducer(conn *amqp.Connection) (*Producer, error) {
-	if conn == nil {
-		return nil, fmt.Errorf("connection is nil")
-	}
-
-	if conn.IsClosed() {
-		return nil, fmt.Errorf("connection is closed")
-	}
-
-	ch, err := conn.Channel()
+func NewProducer() (*Producer, error) {
+	ma, err := SelectConnFactory.GetManager()
 	if err != nil {
-		return nil, fmt.Errorf("failed to open channel: %v", err)
+		return nil, err
 	}
 
-	// 設置 channel 的 confirm mode
-	if err := ch.Confirm(false); err != nil {
-		ch.Close()
+	channelId, channel, err := ma.RegisterChannel()
+	if err != nil {
+		return nil, err
+	}
+
+	if channel.IsClosed() {
+		return nil, fmt.Errorf("channel is closed")
+	}
+
+	if err := channel.Confirm(false); err != nil {
+		channel.Close()
 		return nil, fmt.Errorf("failed to set confirm mode: %v", err)
 	}
 
 	return &Producer{
-		conn:    conn,
-		channel: ch,
-		done:    make(chan struct{}),
+		channel:   channel,
+		channelId: channelId,
+		done:      make(chan struct{}),
 	}, nil
 }
 
@@ -92,8 +92,11 @@ func (p *Producer) Publish(exchange, routingKey string, message []byte) error {
 // Close 關閉生產者
 func (p *Producer) Close() error {
 	close(p.done)
-	if err := p.channel.Close(); err != nil {
-		return fmt.Errorf("failed to close channel: %v", err)
+	ma, err := SelectConnFactory.GetManager()
+	if err != nil {
+		return err
 	}
-	return nil
+
+	err = ma.ReleaseChannel(p.channelId)
+	return err
 }

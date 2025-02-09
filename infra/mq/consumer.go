@@ -13,24 +13,36 @@ type IConsumer interface {
 }
 
 type ConsumerV2 struct {
-	name    string
-	channel *amqp.Channel
-	done    chan struct{}
+	name      string
+	channel   *amqp.Channel
+	channelId int
+	done      chan struct{}
 }
 
 func NewConsumerV2(name string, channel *amqp.Channel) (*ConsumerV2, error) {
-	if channel == nil {
-		return nil, fmt.Errorf("channel is nil")
+	ma, err := SelectConnFactory.GetManager()
+	if err != nil {
+		return nil, err
+	}
+
+	channelId, channel, err := ma.RegisterChannel()
+	if err != nil {
+		return nil, err
 	}
 
 	if channel.IsClosed() {
 		return nil, fmt.Errorf("channel is closed")
 	}
 
+	if err := channel.Confirm(false); err != nil {
+		channel.Close()
+		return nil, fmt.Errorf("failed to set confirm mode: %v", err)
+	}
 	return &ConsumerV2{
-		name:    name,
-		channel: channel,
-		done:    make(chan struct{}),
+		name:      name,
+		channel:   channel,
+		channelId: channelId,
+		done:      make(chan struct{}),
 	}, nil
 }
 
@@ -99,8 +111,11 @@ func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) error
 func (c *ConsumerV2) Close() error {
 	fmt.Print("開始關閉consumer")
 	close(c.done)
-	if err := c.channel.Close(); err != nil {
-		return fmt.Errorf("failed to close channel: %v", err)
+	ma, err := SelectConnFactory.GetManager()
+	if err != nil {
+		return err
 	}
-	return nil
+
+	err = ma.ReleaseChannel(c.channelId)
+	return err
 }
