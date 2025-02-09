@@ -1,0 +1,30 @@
+# Go 編譯檔
+**/bin/
+**/pkg/
+
+# Go 編譯產生的執行檔
+**/*.exe
+**/*.exe~
+**/*.dll
+**/*.so
+**/*.dylib
+
+# Go 相關檔案
+**/go.work
+**/go.sum
+
+# IDE 相關
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# 測試相關
+**/*.test
+**/coverage.txt
+**/coverage.html
+
+# OS 相關
+**/.DS_Store
+**/Thumbs.db
+
+**/temp
