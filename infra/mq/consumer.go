@@ -19,7 +19,7 @@ type ConsumerV2 struct {
 	done      chan struct{}
 }
 
-func NewConsumerV2(name string, channel *amqp.Channel) (*ConsumerV2, error) {
+func NewConsumerV2(name string) (*ConsumerV2, error) {
 	ma, err := SelectConnFactory.GetManager()
 	if err != nil {
 		return nil, err
