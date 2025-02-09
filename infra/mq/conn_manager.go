@@ -16,6 +16,7 @@ type IMQConnManager interface {
 	RegisterChannel() (int, *amqp.Channel, error)
 	GetChannel(channelId int) (*amqp.Channel, error)
 	ReleaseChannel(channelId int) error
+	Close() error
 }
 
 type MQConnParams struct {
