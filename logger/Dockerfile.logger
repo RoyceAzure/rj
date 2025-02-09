@@ -8,7 +8,7 @@ RUN go build -o main cmd/main.go
 FROM golang:1.23-alpine3.21
 WORKDIR /app
 COPY --from=builder /app/main .
-COPY app.env .
+COPY .env .
 COPY go.mod .
 
 ENV SERVICEID=logger

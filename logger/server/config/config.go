@@ -70,7 +70,7 @@ func loadConfig() (cf *Config, err error) {
 	defer config_siongleton.mu.Unlock()
 
 	cf = &Config{}
-	viper.SetConfigFile(fmt.Sprintf("%s/server/.env", getProjectRoot("github.com/RoyceAzure/rj/logger")))
+	viper.SetConfigFile(fmt.Sprintf("%s/.env", getProjectRoot("github.com/RoyceAzure/rj/logger")))
 	viper.AutomaticEnv()
 
 	err = viper.ReadInConfig()
