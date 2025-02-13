@@ -116,6 +116,5 @@ func (c *ConsumerV2) Close() error {
 		return err
 	}
 
-	err = ma.ReleaseChannel(c.channelId)
-	return err
+	return ma.ReleaseChannel(c.channelId)
 }

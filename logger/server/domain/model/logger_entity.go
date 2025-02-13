@@ -11,6 +11,7 @@ import (
 type MQLog struct {
 	ID            int64     `json:"id"`
 	Timestamp     time.Time `json:"timestamp"`
+	Project       string    `json:"project"`
 	Module        string    `json:"module"`
 	Action        string    `json:"action"`
 	Message       string    `json:"message"`

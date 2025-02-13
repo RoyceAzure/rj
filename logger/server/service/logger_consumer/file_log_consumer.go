@@ -13,7 +13,7 @@ import (
 // 不使用DI
 type FileLoggerConsumer struct {
 	consumer   mq.IConsumer
-	fileLogger *customerlogger.FileLogger
+	fileLogger customerlogger.ILogger
 	closed     atomic.Bool // 添加狀態追踪
 }
 

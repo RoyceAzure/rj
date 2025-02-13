@@ -7,7 +7,7 @@ import (
 
 	"github.com/RoyceAzure/rj/infra/mq"
 	"github.com/RoyceAzure/rj/logger/server/config"
-	loggerconsumer "github.com/RoyceAzure/rj/logger/server/service/logger/logger_consumer"
+	loggerconsumer "github.com/RoyceAzure/rj/logger/server/service/logger_consumer"
 	"github.com/rs/zerolog"
 )
 

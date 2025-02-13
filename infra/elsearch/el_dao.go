@@ -173,6 +173,7 @@ func (e *ElSearchDao) Search(index string, query elastic.Query) ([]byte, error) 
 	// 將整個結果轉換為 JSON
 	return json.Marshal(hits)
 }
-func (e *ElSearchDao) Close() {
+func (e *ElSearchDao) Close() error {
 	e.client.Stop()
+	return nil
 }

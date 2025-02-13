@@ -3,7 +3,7 @@ package asynq_worker
 import (
 	"fmt"
 
-	logservice "github.com/RoyceAzure/rj/logger/server/service/logger"
+	logservice "github.com/RoyceAzure/rj/logger/server/service/logger_consumer"
 	"github.com/rs/zerolog"
 )
 
