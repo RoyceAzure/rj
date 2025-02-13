@@ -1,0 +1,15 @@
+FROM sebp/elk:latest
+
+# 設定環境變數
+ENV ES_HOME /opt/elasticsearch
+ENV KIBANA_HOME /opt/kibana
+ENV ELASTICSEARCH_HOSTS=http://localhost:9200
+ENV ELASTIC_PASSWORD=123456     
+ENV ELASTICSEARCH_SECURITY=true      
+
+# 暴露端口
+EXPOSE 5601 9200 5044
+
+# 健康檢查
+HEALTHCHECK --interval=30s --timeout=10s \
+  CMD curl -f http://localhost:9200/_cat/health || exit 1
