@@ -22,7 +22,7 @@ type IElSearchDao interface {
 	Read(index, id string) ([]byte, error)
 	Update(index, id string, data []byte) error
 	Delete(index, id string) error
-	Search(index string, query elastic.Query) ([][]byte, error)
+	Search(index string, query elastic.Query) ([]byte, error)
 	Close() error
 }
 
