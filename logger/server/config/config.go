@@ -24,6 +24,9 @@ type Config struct {
 	MqVHost           string `mapstructure:"MQ_VHOST"`
 	MqUser            string `mapstructure:"MQ_USER"`
 	MqPassword        string `mapstructure:"MQ_PASSWORD"`
+	ElSearchHost      string `mapstructure:"ELSEARCH_HOST"`
+	ElSearchPort      string `mapstructure:"ELSEARCH_PORT"`
+	ElSearchPassword  string `mapstructure:"ELSEARCH_PASSWIRD"`
 }
 
 var config_siongleton *ConfigSingleTon

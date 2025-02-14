@@ -4,12 +4,11 @@ import (
 	"fmt"
 
 	"github.com/RoyceAzure/rj/infra/elsearch"
-	customerlogger "github.com/RoyceAzure/rj/logger/server/infrastructure/customer_logger"
 	"github.com/olivere/elastic/v7"
 )
 
 type IFactory interface {
-	GetLoggerConsummer() ILoggerConsumer
+	GetLoggerConsumer() (ILoggerConsumer, error)
 }
 
 type LogConsumerConfig struct {
@@ -45,6 +44,5 @@ func (e *ElasticFactory) GetLoggerConsumer() (ILoggerConsumer, error) {
 		return nil, err
 	}
 
-	elLogger := customerlogger.NewElLogger(elDao)
-	return nil, nil
+	return NewElLoggerConsumer(elDao)
 }

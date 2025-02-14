@@ -3,11 +3,12 @@ module github.com/RoyceAzure/rj/logger
 go 1.23.3
 
 require (
-	github.com/RoyceAzure/rj/infra v0.0.0-20250213133722-553e6de96669
+	github.com/RoyceAzure/rj/infra v0.0.0-20250214090802-cb96d7e489c7
 	github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/hibiken/asynq v0.25.1
+	github.com/olivere/elastic/v7 v7.0.32
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
 	go.mongodb.org/mongo-driver v1.17.2
@@ -26,12 +27,11 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
-	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect

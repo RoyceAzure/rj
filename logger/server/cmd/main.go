@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"path/filepath"
 	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq"
@@ -27,11 +27,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fileLogConsumer, err := loggerconsumer.NewFileLoggerConsumer(filepath.Join(cf.LocalLogFileDir, "savefile.txt"))
+	var logFactory loggerconsumer.IFactory
+
+	logFactory, err = loggerconsumer.NewElasticFactory(&loggerconsumer.LogConsumerConfig{
+		ElUrl: fmt.Sprintf("%s:%s", cf.ElSearchHost, cf.ElSearchPort),
+		ElPas: cf.ElSearchPassword,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = fileLogConsumer.Start("local_file_logs")
+
+	loggerconsumer, err := logFactory.GetLoggerConsumer()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loggerconsumer.Start("local_file_logs")
 	if err != nil {
 		log.Fatal(err)
 	}
