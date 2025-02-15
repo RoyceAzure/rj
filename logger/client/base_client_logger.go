@@ -12,9 +12,11 @@ import (
 )
 
 type BaseMQClientLoggerParams struct {
-	Exchange   string `validate:"required" json:"exchange"`    // required 表示必須有值
-	RoutingKey string `validate:"required" json:"routing_key"` // required 表示必須有值
-	Module     string `json:"module"`                          // 非必填
+	Exchange        string `validate:"required" json:"exchange"`    // required 表示必須有值
+	RoutingKey      string `validate:"required" json:"routing_key"` // required 表示必須有值
+	Module          string `json:"module"`                          // 非必填
+	Project         string `json:"project"`                         // 非必填
+	LogFileSavePath string //for file logger
 }
 
 func (p *BaseMQClientLoggerParams) Validate() error {
@@ -36,6 +38,11 @@ func (p *BaseMQClientLoggerParams) Validate() error {
 		return err
 	}
 	return nil
+}
+
+// used with zero logger
+type ILoggerProcuder interface {
+	Write(p []byte) (n int, err error)
 }
 
 type BaseMQClientLogger struct {
@@ -64,6 +71,9 @@ func (bl *BaseMQClientLogger) extractLogEntity(p []byte) (*model.MQLog, error) {
 	}
 
 	// 處理字串類型欄位
+	if project, ok := zeroLogData["project"].(string); ok {
+		mqLog.Project = project
+	}
 	if module, ok := zeroLogData["module"].(string); ok {
 		mqLog.Module = module
 	}
