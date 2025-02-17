@@ -14,6 +14,7 @@ type ThreadSafeProducer struct {
 	channelId int
 	msgChan   chan publishRequest
 	errChan   chan error //for publish error chan
+	confirms  chan amqp.Confirmation
 	done      chan struct{}
 }
 
@@ -43,11 +44,14 @@ func NewThreadSafeProducer() (*ThreadSafeProducer, error) {
 		return nil, fmt.Errorf("failed to set confirm mode: %v", err)
 	}
 
+	confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
+
 	return &ThreadSafeProducer{
 		channel:   channel,
 		channelId: channelId,
 		msgChan:   make(chan publishRequest, 100),
 		errChan:   make(chan error, 100),
+		confirms:  confirms,
 		done:      make(chan struct{}),
 	}, nil
 }
@@ -77,9 +81,6 @@ func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte
 	default:
 	}
 
-	// 獲取確認通道
-	confirms := p.channel.NotifyPublish(make(chan amqp.Confirmation, 1))
-
 	// 使用 context 控制超時
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -100,7 +101,7 @@ func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte
 	}
 
 	select {
-	case confirm := <-confirms:
+	case confirm := <-p.confirms:
 		if !confirm.Ack {
 			return fmt.Errorf("failed to receive confirmation for message")
 		}
@@ -146,7 +147,9 @@ func (p *ThreadSafeProducer) Start() {
 }
 
 func (p *ThreadSafeProducer) handleError(err error) error {
-	log.Print(err)
+	if err != nil {
+		log.Print(err)
+	}
 	return nil
 }
 
