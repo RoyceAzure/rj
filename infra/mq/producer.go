@@ -17,6 +17,7 @@ type Producer struct {
 	channel   *amqp.Channel
 	channelId int
 	done      chan struct{}
+	confirms  chan amqp.Confirmation
 }
 
 func NewProducer() (*Producer, error) {
@@ -39,10 +40,12 @@ func NewProducer() (*Producer, error) {
 		return nil, fmt.Errorf("failed to set confirm mode: %v", err)
 	}
 
+	confirms := channel.NotifyPublish(make(chan amqp.Confirmation, 1))
 	return &Producer{
 		channel:   channel,
 		channelId: channelId,
 		done:      make(chan struct{}),
+		confirms:  confirms,
 	}, nil
 }
 
@@ -58,9 +61,6 @@ func (p *Producer) Publish(exchange, routingKey string, message []byte) error {
 		return fmt.Errorf("producer is closed")
 	default:
 	}
-
-	// 獲取確認通道
-	confirms := p.channel.NotifyPublish(make(chan amqp.Confirmation, 1))
 
 	err := p.channel.Publish(
 		exchange,   // exchange
@@ -78,7 +78,7 @@ func (p *Producer) Publish(exchange, routingKey string, message []byte) error {
 
 	// 等待發布確認
 	select {
-	case confirm := <-confirms:
+	case confirm := <-p.confirms:
 		if !confirm.Ack {
 			return fmt.Errorf("failed to receive confirmation for message")
 		}
