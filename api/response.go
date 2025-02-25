@@ -41,7 +41,10 @@ func JSON(w http.ResponseWriter, status int, data any) {
 }
 
 func ErrorJSON(w http.ResponseWriter, status int, err error, errMsg string) {
-	details := strings.Split(err.Error(), "\n")
+	var details []string
+	if err != nil {
+		details = strings.Split(err.Error(), "\n")
+	}
 
 	JSON(w, status, FailedResponse{
 		Success: false,
