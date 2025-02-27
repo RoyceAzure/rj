@@ -3,6 +3,7 @@ package util
 import (
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -30,4 +31,12 @@ func UUIDToBytes(id uuid.UUID) []byte {
 	bytes := make([]byte, 16)
 	copy(bytes, id[:])
 	return bytes
+}
+
+func RFC3339ToTimestamp(timeStr string) (int64, error) {
+	t, err := time.Parse(time.RFC3339, timeStr)
+	if err != nil {
+		return 0, err
+	}
+	return t.Unix(), nil
 }
