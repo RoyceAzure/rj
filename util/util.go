@@ -40,3 +40,16 @@ func RFC3339ToTimestamp(timeStr string) (int64, error) {
 	}
 	return t.Unix(), nil
 }
+
+func StringPtrOrNil(s *string) *string {
+	if s == nil {
+		return nil
+	}
+
+	trimmed := strings.TrimSpace(*s)
+
+	if trimmed == "" {
+		return nil
+	}
+	return &trimmed
+}
