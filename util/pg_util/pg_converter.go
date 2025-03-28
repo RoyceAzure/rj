@@ -41,14 +41,14 @@ func PgTextToStringV5(text pgtype.Text) *string {
 }
 
 // TimeToPgTimestamptz 將 time.Time 轉換為 pgtype.Timestamptz
-func TimeToPgTimestamptzV5(t time.Time) pgtype.Timestamptz {
-	if t.IsZero() {
+func TimeToPgTimestamptzV5(t *time.Time) pgtype.Timestamptz {
+	if t == nil || t.IsZero() {
 		return pgtype.Timestamptz{Valid: false}
 	}
-	return pgtype.Timestamptz{Time: t, Valid: true}
+	return pgtype.Timestamptz{Time: *t, Valid: true}
 }
 
-// PgTimestamptzToTime 將 pgtype.Timestamptz 轉換為 time.Time 指針
+// PgTimestamptzToTime 將 pgtype.Timestamptz 轉換為 time.Time
 func PgTimestamptzToTimeV5(ts pgtype.Timestamptz) *time.Time {
 	if !ts.Valid {
 		return nil
