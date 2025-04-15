@@ -20,7 +20,7 @@ func CsvToJSON(csvData []byte) ([]map[string]string, error) {
 	}
 
 	if len(records) <= 1 {
-		return nil, ErrEmptyCSV
+		return []map[string]string{}, ErrEmptyCSV
 	}
 
 	headers := records[0]
