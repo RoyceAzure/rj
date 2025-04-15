@@ -1,0 +1,14 @@
+FROM rabbitmq:3-management
+
+
+COPY definitions.json /etc/rabbitmq/definitions.json
+COPY rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
+
+RUN chmod 444 /etc/rabbitmq/definitions.json /etc/rabbitmq/rabbitmq.conf
+
+
+EXPOSE 5672
+EXPOSE 15672
+
+HEALTHCHECK --interval=5s --timeout=10s --retries=5 \
+CMD rabbitmq-diagnostics check_port_connectivity

@@ -1,15 +1,15 @@
-FROM sebp/elk:latest
-
-# 設定環境變數
-ENV ES_HOME /opt/elasticsearch
-ENV KIBANA_HOME /opt/kibana
-ENV ELASTICSEARCH_HOSTS=http://localhost:9200
-ENV ELASTIC_PASSWORD=123456     
-ENV ELASTICSEARCH_SECURITY=true      
-
-# 暴露端口
-EXPOSE 5601 9200 5044
-
-# 健康檢查
-HEALTHCHECK --interval=30s --timeout=10s \
-  CMD curl -f http://localhost:9200/_cat/health || exit 1
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+ARG ELASTIC_PASSWORD
+ARG ELASTIC_HOST
+ENV ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+ENV ELASTIC_HOST=${ELASTIC_HOST}
+ENV discovery.type=single-node
+ENV xpack.security.enabled=true
+ENV http.cors.enabled=true
+ENV http.cors.allow-origin="*"
+ENV http.cors.allow-headers=X-Requested-With,Content-Type,Content-Length,Authorization
+ENV ES_JAVA_OPTS="-Xms512m -Xmx512m"
+EXPOSE 9200
+EXPOSE 9300
+HEALTHCHECK --interval=5s --timeout=10s \
+  CMD curl -f -u elastic:${ELASTIC_PASSWORD} http://${ELASTIC_HOST}:9200/_cat/health
