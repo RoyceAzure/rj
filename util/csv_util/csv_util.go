@@ -9,7 +9,7 @@ import (
 type CsvUtilError error
 
 var (
-	ErrEmptyCSV CsvUtilError = errors.New("CSV file has no data or only headers")
+	ErrEmptyCSV CsvUtilError = errors.New("CSV file has no data")
 )
 
 func CsvToJSON(csvData []byte) ([]map[string]string, error) {
@@ -19,7 +19,7 @@ func CsvToJSON(csvData []byte) ([]map[string]string, error) {
 		return nil, err
 	}
 
-	if len(records) <= 1 {
+	if len(records) < 1 {
 		return []map[string]string{}, ErrEmptyCSV
 	}
 
