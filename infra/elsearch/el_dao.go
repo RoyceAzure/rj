@@ -103,9 +103,16 @@ type Log struct {
 
 // Create 泛型創建方法
 func (e *ElSearchDao) Create(index string, data []byte) error {
-	_, err := e.client.Index().
+	var anyJson map[string]any
+
+	err := json.Unmarshal(data, &anyJson)
+	if err != nil {
+		return err
+	}
+
+	_, err = e.client.Index().
 		Index(index).
-		BodyString(string(data)).
+		BodyJson(anyJson).
 		Do(context.Background())
 	return err
 }
