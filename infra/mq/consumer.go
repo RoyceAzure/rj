@@ -91,8 +91,7 @@ func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) error
 				fmt.Printf("Consumer %s, 接收到消息，提交給handler處理\n", c.name)
 				err := handler(msg.Body)
 				if err != nil {
-					// 如果處理失敗，拒絕訊息並重新入列
-					msg.Nack(false, true)
+					fmt.Printf("Consumer %s, 處理消息失敗, 拒絕訊息\n", err)
 					continue
 				}
 				// 確認訊息
