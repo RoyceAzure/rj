@@ -1,8 +1,9 @@
 package test
 
 import (
-	"sync"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq"
 	"github.com/RoyceAzure/rj/infra/mq/internal/client"
@@ -44,38 +45,126 @@ func TestProducer(t *testing.T) {
 func TestThreadSafeProducer(t *testing.T) {
 	err := mq.SelectConnFactory.Init(mq.MQConnParams{
 		MqHost:  "localhost",
-		MqUser:  "stock_ana_mq",
-		MqPas:   "123456",
+		MqUser:  "royce",
+		MqPas:   "password",
 		MqPort:  "5672",
 		MqVHost: "/",
 	})
 	require.NoError(t, err)
 
-	num := 200
-	msg := []byte{1, 2, 3, 4}
-	var wg sync.WaitGroup
+	numProducer := 3
+	numMsg := 100
 	errChan := make(chan error, 100)
-	producer, err := client.NewThreadSafeProducer()
-	producer.Start()
+	producers := make([]*client.ThreadSafeProducer, numProducer)
 	require.NoError(t, err)
-	for i := 0; i < num; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for i := 0; i < 30; i++ {
-				err := producer.Publish("data_processer", "backtesting", msg)
-				if err != nil {
-					errChan <- err
-				}
-			}
-		}()
-
-		// err := producer.Publish("data_processer", "backtesting", msg)
-		// require.NoError(t, err)
+	for i := 0; i < numProducer; i++ {
+		producerNmae := fmt.Sprintf("test_producer_%d", i)
+		producer, err := client.NewThreadSafeProducer(producerNmae)
+		if err != nil {
+			return
+		}
+		producers[i] = producer
+		producer.Start()
 	}
-	wg.Wait()
-	// producer.Close()
+
+	for i := 0; i < numMsg; i++ {
+		msg := fmt.Sprintf("this is test %d", i)
+		producers[i%numProducer].Publish("system_logs", "log.file.el", []byte(msg))
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	for _, producer := range producers {
+		producer.Close()
+	}
+	time.Sleep(10 * time.Second)
+
 	require.Empty(t, errChan)
-	ch := make(chan struct{})
-	<-ch
+}
+
+func TestThreadSafeProducerClose(t *testing.T) {
+	err := mq.SelectConnFactory.Init(mq.MQConnParams{
+		MqHost:  "localhost",
+		MqUser:  "royce",
+		MqPas:   "password",
+		MqPort:  "5672",
+		MqVHost: "/",
+	})
+	require.NoError(t, err)
+
+	numProducer := 3
+	numMsg := 100
+	errChan := make(chan error, 100)
+	producers := make([]*client.ThreadSafeProducer, numProducer)
+	require.NoError(t, err)
+	for i := 0; i < numProducer; i++ {
+		producerNmae := fmt.Sprintf("test_producer_%d", i)
+		producer, err := client.NewThreadSafeProducer(producerNmae)
+		if err != nil {
+			return
+		}
+		producers[i] = producer
+		producer.Start()
+	}
+
+	go func() {
+		for i := 0; i < numMsg; i++ {
+			msg := fmt.Sprintf("this is test %d", i)
+			producers[i%numProducer].Publish("system_logs", "log.file.el", []byte(msg))
+			time.Sleep(1000 * time.Millisecond)
+		}
+	}()
+
+	time.Sleep(5 * time.Second)
+	for _, producer := range producers {
+		producer.Close()
+	}
+
+	time.Sleep(10 * time.Second)
+	require.Empty(t, errChan)
+}
+
+func TestThreadSafeProducerReStart(t *testing.T) {
+	err := mq.SelectConnFactory.Init(mq.MQConnParams{
+		MqHost:  "localhost",
+		MqUser:  "royce",
+		MqPas:   "password",
+		MqPort:  "5672",
+		MqVHost: "/",
+	})
+	require.NoError(t, err)
+
+	numProducer := 3
+	numMsg := 100
+	errChan := make(chan error, 100)
+	producers := make([]*client.ThreadSafeProducer, numProducer)
+	require.NoError(t, err)
+	for i := 0; i < numProducer; i++ {
+		producerNmae := fmt.Sprintf("test_producer_%d", i)
+		producer, err := client.NewThreadSafeProducer(producerNmae)
+		if err != nil {
+			return
+		}
+		producers[i] = producer
+		producer.Start()
+	}
+
+	go func() {
+		for i := 0; i < numMsg; i++ {
+			msg := fmt.Sprintf("this is test %d", i)
+			producers[i%numProducer].Publish("system_logs", "log.file.el", []byte(msg))
+			time.Sleep(1000 * time.Millisecond)
+		}
+	}()
+
+	time.Sleep(5 * time.Second)
+	for _, producer := range producers {
+		producer.Close()
+	}
+
+	time.Sleep(10 * time.Second)
+	for _, producer := range producers {
+		producer.ReStart()
+	}
+	time.Sleep(10 * time.Second)
+	require.Empty(t, errChan)
 }

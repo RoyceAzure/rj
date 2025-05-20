@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/RoyceAzure/rj/infra/mq"
@@ -27,7 +26,7 @@ func main() {
 	}
 
 	consumer.Consume("local_file_logs", func(msg []byte) error {
-		fmt.Println(string(msg))
+		log.Println(string(msg))
 		return nil
 	})
 	select {}

@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -14,26 +13,23 @@ import (
 
 // 基礎的消費者與生產者
 type BaseClient struct {
-	id         string
-	name       string
-	channel    *amqp.Channel
-	channelMu  sync.RWMutex
-	status     atomic.Int32
-	ctx        context.Context
-	cancelFunc context.CancelFunc
+	id        string
+	name      string
+	channel   *amqp.Channel
+	channelMu sync.RWMutex
+	status    atomic.Int32
+	done      chan struct{}
 }
 
 func NewBaseClient(name string) *BaseClient {
-	ctx, cancel := context.WithCancel(context.Background())
 	return &BaseClient{
-		id:         uuid.New().String(),
-		name:       name,
-		ctx:        ctx,
-		cancelFunc: cancel,
+		id:   uuid.New().String(),
+		name: name,
+		done: make(chan struct{}),
 	}
 }
 
-func (b *BaseClient) getChanFromManger() error {
+func (b *BaseClient) setChanFromManger() error {
 	b.status.Store(int32(constant.ClientInit))
 	ma, err := mq.SelectConnFactory.GetManager()
 	if err != nil {
@@ -70,7 +66,7 @@ func (b *BaseClient) resetChannel() error {
 		return nil
 	}
 
-	fmt.Print("consumer 重置channel")
+	fmt.Printf("client %s_%s 重置channel", b.name, b.id)
 	b.status.Store(int32(constant.ClientReset))
 	ma, err := mq.SelectConnFactory.GetManager()
 	if err != nil {
@@ -89,14 +85,14 @@ func (b *BaseClient) resetChannel() error {
 		select {
 		case <-ch:
 			break
-		case <-b.ctx.Done():
-			return fmt.Errorf("consumer 已經關閉，終止重置channel")
+		case <-b.done:
+			return fmt.Errorf("client 已經關閉，終止重置channel")
 		}
 
 	}
 
 	fmt.Printf("conn manager 連線恢復, 重置channel")
-	err = b.getChanFromManger()
+	err = b.setChanFromManger()
 	if err != nil {
 		return err
 	}
@@ -104,25 +100,23 @@ func (b *BaseClient) resetChannel() error {
 	return nil
 }
 
-// Close 關閉消費者
-func (b *BaseClient) Close() error {
-	return b.close()
-}
-
-// 設定狀態為Stop
-// 關閉done channel
+// 設置狀態與發送結束訊號
 func (b *BaseClient) close() error {
-	fmt.Print("開始關閉consumer")
+	if b.status.Load() == int32(constant.ClientStop) {
+		return nil
+	}
+
+	fmt.Printf("開始關閉 client %s_%s", b.name, b.id)
+	close(b.done)
 	b.status.Store(int32(constant.ClientStop))
-	b.cancelFunc()
 	return nil
 }
 
 // 只有當consumer處於Stop狀態時 才會執行重啟
 func (b *BaseClient) reStart() error {
-	fmt.Print("開始重啟consumer")
+	fmt.Printf("開始重啟 client %s_%s", b.name, b.id)
 	if b.status.Load() != int32(constant.ClientStop) {
-		return fmt.Errorf("consumer is not in stop state")
+		return fmt.Errorf("client is not in stop state")
 	}
 
 	err := b.reSet()
@@ -136,9 +130,7 @@ func (b *BaseClient) reStart() error {
 // BaseClient 狀態重置
 func (b *BaseClient) reSet() error {
 	b.status.Store(int32(constant.ClientInit))
-	ctx, cancel := context.WithCancel(context.Background())
-	b.ctx = ctx
-	b.cancelFunc = cancel
+	b.done = make(chan struct{})
 	err := b.resetChannel()
 	if err != nil {
 		return err

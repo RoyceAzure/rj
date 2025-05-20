@@ -23,7 +23,7 @@ func NewConsumerV2(name string) (*ConsumerV2, error) {
 		BaseClient: NewBaseClient(name),
 	}
 
-	err := consumer.getChanFromManger()
+	err := consumer.setChanFromManger()
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *ConsumerV2) consume(msgs <-chan amqp.Delivery, handler func([]byte) err
 			// 確認訊息
 			msg.Ack(false)
 
-		case <-c.ctx.Done():
+		case <-c.done:
 			fmt.Printf("Consumer %s_%s, 結束消費程序\n", c.name, c.id)
 			return 0, nil
 		}
@@ -130,4 +130,9 @@ func (c *ConsumerV2) ReStart(queueName string, handler func([]byte) error) error
 
 	c.Consume(queueName, handler)
 	return nil
+}
+
+func (c *ConsumerV2) Close() error {
+	fmt.Printf("consumer %s_%s 開始關閉 ", c.name, c.id)
+	return c.close()
 }
