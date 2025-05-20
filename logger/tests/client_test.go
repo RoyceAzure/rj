@@ -4,30 +4,35 @@ import (
 	"testing"
 
 	"github.com/RoyceAzure/rj/infra/mq"
-	"github.com/RoyceAzure/rj/logger/client"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger_producer"
 	"github.com/stretchr/testify/require"
 )
 
 func TestXxx(t *testing.T) {
 	err := mq.SelectConnFactory.Init(mq.MQConnParams{
 		MqHost:  "localhost",
-		MqUser:  "stock_ana_mq",
-		MqPas:   "123456",
+		MqUser:  "royce",
+		MqPas:   "password",
 		MqPort:  "5672",
 		MqVHost: "/",
 	})
 	require.NoError(t, err)
 
-	var f client.IClientFactory
-	f, err = client.NewElasticFactory(&client.BaseMQClientLoggerParams{
+	var f logger_producer.IClientFactory
+	f, err = logger_producer.NewElasticFactory(&logger_producer.BaseMQClientLoggerParams{
 		Exchange:   "system_logs",
 		RoutingKey: "log.file.el",
 		Module:     "logger-client",
-		Project:    "logger",
+		Project:    "test",
 	})
 	require.NoError(t, err)
 
 	loggerProducer, err := f.GetLoggerProcuder()
 	require.NoError(t, err)
-	loggerProducer.Info().Str("action", "unit test 3").Msg("this is test")
+	loggerProducer.Info().
+		Str("action", "unit test 22").
+		Str("url", "test url").
+		Str("upn", "test upn").
+		Str("random", "test random").
+		Msg("this is test 38")
 }

@@ -1,5 +1,7 @@
 github.com/RoyceAzure/rj/infra v0.0.0-20250214090802-cb96d7e489c7 h1:gjAil66jaPJyKaR/gyl9F198fZ+ixdCTG2ay84m2DaQ=
 github.com/RoyceAzure/rj/infra v0.0.0-20250214090802-cb96d7e489c7/go.mod h1:rFXXdC5yhbWJvKPW378cgQv/56Ole2d1FhX9L6FTNaA=
+github.com/RoyceAzure/rj/infra v0.0.0-20250518090956-71c345e7a7bd h1:xxEBanRfEgj4C/dQLiVHzg7SYtgdsbPJeYOTUi+olhQ=
+github.com/RoyceAzure/rj/infra v0.0.0-20250518090956-71c345e7a7bd/go.mod h1:VZPeyG1XwrcEhMeDXy43J2QCsJKfKjNl5REal6ZkQvM=
 github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb h1:0nxwS8CWEnbWrJyk8mI/AsmX/oWESLLmWQpf5RW56jw=
 github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb/go.mod h1:XDiKP8ZJOSdRb7DlxQVv29TJ88r5Q4DqWlYWGnAwEkc=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
