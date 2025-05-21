@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq"
-	"github.com/RoyceAzure/rj/infra/mq/internal/client"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/stretchr/testify/require"
 )
 

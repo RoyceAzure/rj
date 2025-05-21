@@ -3,7 +3,7 @@ module github.com/RoyceAzure/rj/logger
 go 1.23.3
 
 require (
-	github.com/RoyceAzure/rj/infra v0.0.0-20250518090956-71c345e7a7bd
+	github.com/RoyceAzure/rj/infra v0.0.0-20250520130915-a78fdf4b3708
 	github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-playground/validator/v10 v10.24.0

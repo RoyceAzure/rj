@@ -3,7 +3,7 @@ package logger_consumer
 import (
 	"io"
 
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/internal/client"
 	"github.com/rs/zerolog"
 )
 
@@ -16,7 +16,7 @@ func SetUpMutiLogger(logger ...io.Writer) error {
 }
 
 type ILoggerConsumer interface {
-	mq.IConsumer
+	client.IConsumer
 	Start(queueName string) error
 	Close() error
 }
