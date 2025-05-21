@@ -95,3 +95,5 @@ func (p *Producer) Close() error {
 	}
 	return nil
 }
+
+var _ IProducer = (*Producer)(nil)

@@ -241,3 +241,5 @@ func (p *ThreadSafeProducer) ReStart() error {
 	p.Start()
 	return nil
 }
+
+var _ IProducer = (*ThreadSafeProducer)(nil)

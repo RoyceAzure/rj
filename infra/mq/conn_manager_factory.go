@@ -47,3 +47,5 @@ func (f *MQConnManagerSingleTonFactory) GetManager() (IMQConnManager, error) {
 
 	return f.instance, nil
 }
+
+var _ MQConnManagerFactory = (*MQConnManagerSingleTonFactory)(nil)

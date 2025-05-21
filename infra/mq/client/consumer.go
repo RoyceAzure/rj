@@ -33,7 +33,7 @@ func NewConsumerV2(name string) (*ConsumerV2, error) {
 }
 
 // 非阻塞消費消息
-func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) {
+func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) error {
 	go func() {
 		for {
 			msgs, err := c.setChannel(queueName)
@@ -59,6 +59,7 @@ func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) {
 			}
 		}
 	}()
+	return nil
 }
 
 func (c *ConsumerV2) setChannel(queueName string) (<-chan amqp.Delivery, error) {
@@ -136,3 +137,5 @@ func (c *ConsumerV2) Close() error {
 	fmt.Printf("consumer %s_%s 開始關閉 ", c.name, c.id)
 	return c.close()
 }
+
+var _ IConsumer = (*ConsumerV2)(nil)

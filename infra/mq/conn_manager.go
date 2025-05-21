@@ -222,3 +222,5 @@ func (r *MQSelectConnManager) Close() error {
 	}
 	return nil
 }
+
+var _ IMQConnManager = (*MQSelectConnManager)(nil)
