@@ -3,7 +3,7 @@ package logger_producer
 import (
 	"fmt"
 
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 )
 
 type ClientElLogger struct {
@@ -12,7 +12,7 @@ type ClientElLogger struct {
 	routingKey string
 }
 
-func NewClientELLogger(producer mq.IProducer, exchange, routingKey string) (*ClientElLogger, error) {
+func NewClientELLogger(producer client.IProducer, exchange, routingKey string) (*ClientElLogger, error) {
 	// 加入參數驗證
 	if producer == nil {
 		return nil, fmt.Errorf("producer cannot be nil")

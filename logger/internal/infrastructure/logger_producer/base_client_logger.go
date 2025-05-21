@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/RoyceAzure/rj/logger/internal/model"
 	"github.com/go-playground/validator/v10"
 )
@@ -46,7 +46,7 @@ type ILoggerProcuder interface {
 }
 
 type BaseMQClientLogger struct {
-	producer mq.IProducer
+	producer client.IProducer
 }
 
 func (bl *BaseMQClientLogger) extractLogEntity(p []byte) (*model.MQLog, error) {

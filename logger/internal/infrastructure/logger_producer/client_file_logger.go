@@ -3,7 +3,7 @@ package logger_producer
 import (
 	"fmt"
 
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 )
 
 // 接收zerologger資料
@@ -14,7 +14,7 @@ type ClientFileLogger struct {
 	logFilePath string
 }
 
-func NewClientFileLogger(producer mq.IProducer, exchange, routingKey, logFilePath string) (*ClientFileLogger, error) {
+func NewClientFileLogger(producer client.IProducer, exchange, routingKey, logFilePath string) (*ClientFileLogger, error) {
 	// 加入參數驗證
 	if producer == nil {
 		return nil, fmt.Errorf("producer cannot be nil")

@@ -3,7 +3,7 @@ package logger_consumer
 import (
 	"io"
 
-	"github.com/RoyceAzure/rj/infra/mq/internal/client"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/rs/zerolog"
 )
 

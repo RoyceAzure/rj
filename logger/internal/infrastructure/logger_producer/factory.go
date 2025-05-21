@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/rs/zerolog"
 )
 
@@ -41,7 +41,7 @@ func (e *FileLoggerFactory) GetLoggerProcuder() (*zerolog.Logger, error) {
 }
 
 func (e *FileLoggerFactory) createFileLogger() (*zerolog.Logger, error) {
-	producer, err := mq.NewThreadSafeProducer()
+	producer, err := client.NewThreadSafeProducer("file_logger_producer")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create producer: %w", err)
 	}
@@ -87,7 +87,7 @@ func (e *ElasticFactory) GetLoggerProcuder() (*zerolog.Logger, error) {
 }
 
 func (e *ElasticFactory) createLoggerProcuder() (*zerolog.Logger, error) {
-	producer, err := mq.NewThreadSafeProducer()
+	producer, err := client.NewThreadSafeProducer("el_logger_producer")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create producer: %w", err)
 	}

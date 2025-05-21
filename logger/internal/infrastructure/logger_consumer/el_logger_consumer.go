@@ -6,12 +6,12 @@ import (
 	"sync/atomic"
 
 	"github.com/RoyceAzure/rj/infra/elsearch"
-	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger"
 )
 
 type ElLoggerConsumer struct {
-	mq.IConsumer
+	client.IConsumer
 	elLogger logger.ILogger
 	closed   atomic.Bool // 添加狀態追踪
 }
@@ -19,7 +19,7 @@ type ElLoggerConsumer struct {
 func NewElLoggerConsumer(elDao elsearch.IElSearchDao) (*ElLoggerConsumer, error) {
 	elLogger := logger.NewElLogger(elDao)
 
-	consumer, err := mq.NewConsumerV2("el_logger_consumer")
+	consumer, err := client.NewConsumerV2("el_logger_consumer")
 	if err != nil {
 		elLogger.Close()
 		return nil, err
@@ -48,7 +48,7 @@ func (fc *ElLoggerConsumer) Start(queueName string) error {
 		return fmt.Errorf("consumer is closed")
 	}
 
-	return fc.Consume(queueName, fc.handler)
+	return fc.IConsumer.Consume(queueName, fc.handler)
 }
 
 func (fc *ElLoggerConsumer) Close() error {
