@@ -23,7 +23,7 @@ evans:
 	docker run -it --rm -v $(current_dir):/mount:ro ghcr.io/ktr0731/evans:latest --host host.docker.internal --port 9090 -r repl
 
 run:
-	go run server/cmd/main.go
+	go run cmd/server/main.go
 
 .PHONY: test db_docs db_schema protoc evans run
  

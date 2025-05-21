@@ -77,7 +77,7 @@ func (r *MQSelectConnManager) Connect() error {
 	config := amqp.Config{
 		Dial: amqp.DefaultDial(time.Second * 5),
 		Properties: amqp.Table{
-			"connection_name": "go_conn_manager",
+			"connection_name": "rj_mq_conn_manager",
 		},
 	}
 

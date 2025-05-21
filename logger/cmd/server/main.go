@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq"
+	"github.com/RoyceAzure/rj/logger/client/consumer"
 	"github.com/RoyceAzure/rj/logger/config"
-	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger_consumer"
 	"github.com/rs/zerolog"
 )
 
@@ -30,9 +30,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var logFactory logger_consumer.IFactory
+	var logFactory consumer.ILoggerConsumerFactory
 
-	logFactory, err = logger_consumer.NewElasticFactory(&logger_consumer.LogConsumerConfig{
+	logFactory, err = consumer.NewElasticFactory(&consumer.LoggerConsumerConfig{
 		ElUrl: fmt.Sprintf("%s:%s", cf.ElSearchHost, cf.ElSearchPort),
 		ElPas: cf.ElSearchPassword,
 	})

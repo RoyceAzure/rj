@@ -1,17 +1,18 @@
-package logger_consumer
+package consumer
 
 import (
 	"fmt"
 
 	"github.com/RoyceAzure/rj/infra/elsearch"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger_consumer"
 	"github.com/olivere/elastic/v7"
 )
 
-type IFactory interface {
-	GetLoggerConsumer() (ILoggerConsumer, error)
+type ILoggerConsumerFactory interface {
+	GetLoggerConsumer() (logger_consumer.ILoggerConsumer, error)
 }
 
-type LogConsumerConfig struct {
+type LoggerConsumerConfig struct {
 	ElUrl       string                     // for el
 	ElPas       string                     // for el
 	ElOptions   []elastic.ClientOptionFunc // for el
@@ -20,10 +21,10 @@ type LogConsumerConfig struct {
 
 // Elasticsearch 工廠
 type ElasticFactory struct {
-	config *LogConsumerConfig
+	config *LoggerConsumerConfig
 }
 
-func NewElasticFactory(config *LogConsumerConfig) (*ElasticFactory, error) {
+func NewElasticFactory(config *LoggerConsumerConfig) (*ElasticFactory, error) {
 	if config.ElUrl == "" || config.ElPas == "" {
 		return nil, fmt.Errorf("must have elurl and elpas")
 	}
@@ -33,7 +34,7 @@ func NewElasticFactory(config *LogConsumerConfig) (*ElasticFactory, error) {
 	}, nil
 }
 
-func (e *ElasticFactory) GetLoggerConsumer() (ILoggerConsumer, error) {
+func (e *ElasticFactory) GetLoggerConsumer() (logger_consumer.ILoggerConsumer, error) {
 	err := elsearch.InitELSearch(e.config.ElUrl, e.config.ElPas, e.config.ElOptions...)
 	if err != nil {
 		return nil, err
@@ -44,5 +45,5 @@ func (e *ElasticFactory) GetLoggerConsumer() (ILoggerConsumer, error) {
 		return nil, err
 	}
 
-	return NewElLoggerConsumer(elDao)
+	return logger_consumer.NewElLoggerConsumer(elDao)
 }

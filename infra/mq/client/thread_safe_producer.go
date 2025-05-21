@@ -123,6 +123,7 @@ func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte
 			Timestamp:   time.Now(),
 		},
 	)
+
 	if err != nil {
 		return fmt.Errorf("failed to publish message: %v", err)
 	}

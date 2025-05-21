@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -42,6 +43,53 @@ func TestProducer(t *testing.T) {
 
 }
 
+func printIntergers(producer *client.ThreadSafeProducer, intergers []int) {
+	for _, i := range intergers {
+		msg := fmt.Sprintf("this is test %d", i)
+		producer.Publish("system_logs", "log.file.el", []byte(msg))
+		time.Sleep(1 * time.Second)
+	}
+}
+func TestThreadSafeProducer_1(t *testing.T) {
+	err := mq.SelectConnFactory.Init(mq.MQConnParams{
+		MqHost:  "localhost",
+		MqUser:  "royce",
+		MqPas:   "password",
+		MqPort:  "5672",
+		MqVHost: "/",
+	})
+	require.NoError(t, err)
+
+	numProducer := 3
+	errChan := make(chan error, 100)
+	require.NoError(t, err)
+	intergers := [][]int{
+		{1, 3, 5, 7, 9, 11},
+		{2, 4, 6, 8, 10, 12},
+		{13, 14, 15, 16, 17, 18},
+	}
+
+	wg := sync.WaitGroup{}
+	for i := 0; i < numProducer; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			producerNmae := fmt.Sprintf("test_producer_%d", i)
+			producer, err := client.NewThreadSafeProducer(producerNmae)
+			if err != nil {
+				return
+			}
+			producer.Start()
+			printIntergers(producer, intergers[i])
+			producer.Close()
+		}(i)
+
+	}
+
+	wg.Wait()
+	require.Empty(t, errChan)
+}
+
 func TestThreadSafeProducer(t *testing.T) {
 	err := mq.SelectConnFactory.Init(mq.MQConnParams{
 		MqHost:  "localhost",
@@ -58,7 +106,7 @@ func TestThreadSafeProducer(t *testing.T) {
 	producers := make([]*client.ThreadSafeProducer, numProducer)
 	require.NoError(t, err)
 	for i := 0; i < numProducer; i++ {
-		producerNmae := fmt.Sprintf("test_producer_%d", i)
+		producerNmae := fmt.Sprintf("test_producer_%d_", i)
 		producer, err := client.NewThreadSafeProducer(producerNmae)
 		if err != nil {
 			return
@@ -69,8 +117,9 @@ func TestThreadSafeProducer(t *testing.T) {
 
 	for i := 0; i < numMsg; i++ {
 		msg := fmt.Sprintf("this is test %d", i)
-		producers[i%numProducer].Publish("system_logs", "log.file.el", []byte(msg))
-		time.Sleep(100 * time.Millisecond)
+		index := i % numProducer
+		producers[index].Publish("system_logs", "log.file.el", []byte(msg))
+		time.Sleep(1 * time.Second)
 	}
 
 	for _, producer := range producers {

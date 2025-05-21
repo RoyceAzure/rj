@@ -2,43 +2,12 @@ package logger_producer
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq/client"
 	"github.com/RoyceAzure/rj/logger/internal/model"
-	"github.com/go-playground/validator/v10"
 )
-
-type BaseMQClientLoggerParams struct {
-	Exchange        string `validate:"required" json:"exchange"`    // required 表示必須有值
-	RoutingKey      string `validate:"required" json:"routing_key"` // required 表示必須有值
-	Module          string `json:"module"`                          // 非必填
-	Project         string `json:"project"`                         // 非必填
-	LogFileSavePath string //for file logger
-}
-
-func (p *BaseMQClientLoggerParams) Validate() error {
-	validate := validator.New()
-
-	if err := validate.Struct(p); err != nil {
-		// 處理驗證錯誤
-		var validationErrors validator.ValidationErrors
-		if errors.As(err, &validationErrors) {
-			for _, e := range validationErrors {
-				switch e.Field() {
-				case "Exchange":
-					return fmt.Errorf("exchange is required")
-				case "RoutingKey":
-					return fmt.Errorf("routing key is required")
-				}
-			}
-		}
-		return err
-	}
-	return nil
-}
 
 // used with zero logger
 type ILoggerProcuder interface {
