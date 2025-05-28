@@ -83,3 +83,7 @@ func RandomNumeric() pgtype.Numeric {
 		Valid: true,
 	}
 }
+
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
+}
