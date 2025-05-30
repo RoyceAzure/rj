@@ -2,6 +2,7 @@ package crypt
 
 import (
 	"fmt"
+	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,4 +18,46 @@ func HashPassword(password string) (string, error) {
 // CheckPassword checks if the provided password is correct or not
 func CheckPassword(password string, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
+// ValidatePassword 檢查密碼是否符合基本要求
+func ValidateStringPassword(password string) error {
+	if len(password) < 8 {
+		return fmt.Errorf("密碼長度至少需要8個字符")
+	}
+
+	var (
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper {
+		return fmt.Errorf("密碼必須包含大寫字母")
+	}
+	if !hasLower {
+		return fmt.Errorf("密碼必須包含小寫字母")
+	}
+	if !hasNumber {
+		return fmt.Errorf("密碼必須包含數字")
+	}
+	if !hasSpecial {
+		return fmt.Errorf("密碼必須包含特殊字符")
+	}
+
+	return nil
 }
