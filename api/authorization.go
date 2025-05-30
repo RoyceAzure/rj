@@ -15,16 +15,16 @@ const (
 	authorizationPayloadKey = "authorization_payload"
 )
 
-type IAuthorizer interface {
-	AuthorizUser(ctx context.Context) (*token.Payload, string, error)
+type IAuthorizer[T token.UserIDConstraint] interface {
+	AuthorizUser(ctx context.Context) (*token.Payload[T], string, error)
 }
 
-type Authorizer struct {
-	tokenMaker token.Maker
+type Authorizer[T token.UserIDConstraint] struct {
+	tokenMaker token.Maker[T]
 }
 
-func NewAuthorizor(tokenMaker token.Maker) IAuthorizer {
-	return &Authorizer{
+func NewAuthorizor[T token.UserIDConstraint](tokenMaker token.Maker[T]) IAuthorizer[T] {
+	return &Authorizer[T]{
 		tokenMaker: tokenMaker,
 	}
 }
@@ -33,7 +33,7 @@ func NewAuthorizor(tokenMaker token.Maker) IAuthorizer {
 從ctx 取得metadata
 從metadata取得authHeader => 檢查格式 => 檢查Bearer => 用tokenMaker 檢查token 內容
 */
-func (auth *Authorizer) AuthorizUser(ctx context.Context) (*token.Payload, string, error) {
+func (auth *Authorizer[T]) AuthorizUser(ctx context.Context) (*token.Payload[T], string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, "", fmt.Errorf("misssing metadata")

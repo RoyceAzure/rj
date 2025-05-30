@@ -8,19 +8,19 @@ import (
 	"github.com/o1egl/paseto"
 )
 
-type PasetoMaker struct {
+type PasetoMaker[T UserIDConstraint] struct {
 	paseto      *paseto.V2
 	symmerickey []byte
 }
 
-func NewPasetoMaker(symmerickey string) (Maker, error) {
+func NewPasetoMaker[T UserIDConstraint](symmerickey string) (Maker[T], error) {
 	if len(symmerickey) != chacha20poly1305.KeySize {
 		return nil, fmt.Errorf("invalid ket size : must be exactly %d charcters", chacha20poly1305.KeySize)
 	}
-	return &PasetoMaker{paseto.NewV2(), []byte(symmerickey)}, nil
+	return &PasetoMaker[T]{paseto.NewV2(), []byte(symmerickey)}, nil
 }
 
-func (maker *PasetoMaker) CreateToken(upn string, userID int64, duration time.Duration) (string, *Payload, error) {
+func (maker *PasetoMaker[T]) CreateToken(upn string, userID T, duration time.Duration) (string, *Payload[T], error) {
 	payload, err := NewPayload(upn, userID, duration)
 	if err != nil {
 		return "", payload, err
@@ -32,8 +32,8 @@ func (maker *PasetoMaker) CreateToken(upn string, userID int64, duration time.Du
 	return token, payload, err
 }
 
-func (maker *PasetoMaker) VertifyToken(token string) (*Payload, error) {
-	payload := &Payload{}
+func (maker *PasetoMaker[T]) VertifyToken(token string) (*Payload[T], error) {
+	payload := &Payload[T]{}
 
 	err := maker.paseto.Decrypt(token, maker.symmerickey, payload, nil)
 	if err != nil {
