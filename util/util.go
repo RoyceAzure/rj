@@ -2,6 +2,7 @@ package util
 
 import (
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,14 +17,22 @@ func StringToNumeric(value string) pgtype.Numeric {
 	return result
 }
 
-func GetProjectRoot() string {
-	// 從 go.mod 讀取模塊路徑
-	cmd := exec.Command("go", "list", "-m", "-f", "{{.Dir}}")
+// Path 相關
+// 取得專案根目錄
+// 參數:
+// moduleName: 模組名稱
+func GetProjectRoot(moduleName string) string {
+	// 執行 go list，但是加上額外的過濾條件
+	cmd := exec.Command("go", "list", "-m", "-f", "{{.Dir}}", moduleName)
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
 	}
 	return strings.TrimSpace(string(output))
+}
+
+func WindwosPathToURL(winPath string) string {
+	return filepath.ToSlash(winPath)
 }
 
 // UUIDToBytes converts a UUID to a byte slice
