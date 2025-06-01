@@ -1,6 +1,7 @@
 package crypt
 
 import (
+	"errors"
 	"fmt"
 	"unicode"
 
@@ -21,9 +22,12 @@ func CheckPassword(password string, hashedPassword string) error {
 }
 
 // ValidatePassword 檢查密碼是否符合基本要求
+// ValidatePassword 檢查密碼是否符合基本要求
 func ValidateStringPassword(password string) error {
+	var errs []error
+
 	if len(password) < 8 {
-		return fmt.Errorf("密碼長度至少需要8個字符")
+		errs = append(errs, fmt.Errorf("密碼長度至少需要8個字符"))
 	}
 
 	var (
@@ -47,16 +51,20 @@ func ValidateStringPassword(password string) error {
 	}
 
 	if !hasUpper {
-		return fmt.Errorf("密碼必須包含大寫字母")
+		errs = append(errs, fmt.Errorf("密碼必須包含大寫字母"))
 	}
 	if !hasLower {
-		return fmt.Errorf("密碼必須包含小寫字母")
+		errs = append(errs, fmt.Errorf("密碼必須包含小寫字母"))
 	}
 	if !hasNumber {
-		return fmt.Errorf("密碼必須包含數字")
+		errs = append(errs, fmt.Errorf("密碼必須包含數字"))
 	}
 	if !hasSpecial {
-		return fmt.Errorf("密碼必須包含特殊字符")
+		errs = append(errs, fmt.Errorf("密碼必須包含特殊字符"))
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
