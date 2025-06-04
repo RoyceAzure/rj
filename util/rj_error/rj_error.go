@@ -140,3 +140,25 @@ func (err *AnaError) Is(target error) bool {
 	}
 	return err.Code == ana_err.Code
 }
+
+// ErrorWrapper 包裝錯誤的結構
+type ErrorWrapper struct {
+	msg string
+	err error
+}
+
+func (e *ErrorWrapper) Error() string {
+	return e.msg + ": " + e.err.Error()
+}
+
+func (e *ErrorWrapper) Unwrap() error {
+	return e.err
+}
+
+// WrapError 包裝錯誤的函數
+func WrapError(err error, msg string) error {
+	return &ErrorWrapper{
+		msg: msg,
+		err: err,
+	}
+}
