@@ -2,6 +2,7 @@ package test
 
 import (
 	"errors"
+	"fmt"
 
 	"testing"
 
@@ -30,6 +31,18 @@ func TestCustomError(t *testing.T) {
 	//測試比較面板值
 	if !errors.Is(err1, er.BadRequestError) {
 		t.Error("相同Code的錯誤應該被視為相同類型")
+	}
+
+	//測試fmt.Sprintf %w
+	wErr_1 := fmt.Errorf("新增錯誤訊息 : %w", err1)
+	if !errors.Is(wErr_1, er.BadRequestError) {
+		t.Error("fmt.Sprintf應該返回正確的錯誤消息")
+	}
+
+	//測試fmt.Sprintf %w 第二層錯誤
+	wErr_2 := fmt.Errorf("新增第二層錯誤訊息 : %w", wErr_1)
+	if !errors.Is(wErr_2, er.BadRequestError) {
+		t.Error("fmt.Sprintf應該返回正確的錯誤消息")
 	}
 
 	// 測試錯誤包裝
