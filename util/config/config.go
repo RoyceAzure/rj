@@ -41,7 +41,7 @@ func GetPGConfig() (*pgConfig, error) {
 單純回傳錯誤  由外部決定要不要Fatal, 畢竟有可能有替代方案
 */
 func loadConfig[T any]() (config *T, err error) {
-	viper.SetConfigFile(filepath.Join(util.GetProjectRoot("{go_moduler_name}"), ".env"))
+	viper.SetConfigFile(filepath.Join(util.GetProjectRoot("github.com/RoyceAzure/rj/util"), ".env"))
 
 	// 先讀取 .env 文件的配置
 	err = viper.ReadInConfig()
@@ -56,5 +56,5 @@ func loadConfig[T any]() (config *T, err error) {
 	if err != nil {
 		return
 	}
-	return config, nil
+	return
 }
