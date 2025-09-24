@@ -27,9 +27,7 @@ type TaskResult struct {
 }
 
 type TaskInfo struct {
-	TaskName string          `json:"task_name"`
-	Module   string          `json:"module"`
-	Action   string          `json:"action"`
+	BaseTaskInfo
 	Metadata json.RawMessage `json:"metadata"` // 使用 json.RawMessage 來保持原始的 JSON 編碼
 }
 

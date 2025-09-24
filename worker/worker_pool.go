@@ -17,16 +17,50 @@ var iterTaskPool = sync.Pool{
 	},
 }
 
+// WorkerPool 管理 Worker
+type WorkerPool struct {
+	pool *sync.Pool
+}
+
+// NewWorkerPool 創建 WorkerPool
+func NewWorkerPool() *WorkerPool {
+	return &WorkerPool{
+		pool: &sync.Pool{
+			New: func() interface{} {
+				return NewWorker(WorkerOption{})
+			},
+		},
+	}
+}
+
+// Get 獲取 Worker
+func (wp *WorkerPool) Get() *Worker {
+	return wp.pool.Get().(*Worker)
+}
+
+// Put 回收 Worker 並清理狀態
+func (wp *WorkerPool) Put(w *Worker) {
+	w.Reset() // 在放回 Pool 前重置狀態
+	wp.pool.Put(w)
+}
+
+// 分配策略要能動態調整
+// worker 要能動態調整
+// 活耀worker 與 worker pool 的互動關係?
+// 什時需要從pool中取出  什時要回收
+// 由誰來做這件事情
+
+//事件分配應該只分配到活耀worker， 而活耀worker數量由一個模組來管理  控制活耀worker 與 worker pool 的互動關係
+// 要有一個統一的SyncTaskSystem 指標  紀錄TaskSystem狀態  用來控制子模組動態協調
+
 /*
-worker啟動後  應該是一職存在  不斷從taskQueue取得task並執行
-負責協調工作要給哪個worker???
-*/
+ */
 type SyncTaskSystem struct {
 	ctx         context.Context
 	cancleFunc  context.CancelFunc
 	taskQueue   chan WorkerTask
 	resultQueue chan *TaskResult
-	workers     []IWoker
+	workers     []IWoker //活耀worker
 	mu          sync.RWMutex
 }
 
