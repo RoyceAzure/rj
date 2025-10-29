@@ -1,8 +1,8 @@
 package kafka
 
 import (
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/config"
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/producer"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/config"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/producer"
 )
 
 func NewKafkaProducer(cfg *config.Config, opts ...producer.Option) (*producer.ConcurrencekafkaProducer, error) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/admin"
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/config"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/admin"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/config"
 	"github.com/segmentio/kafka-go"
 )
 

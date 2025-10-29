@@ -3,8 +3,8 @@ package kafka
 import (
 	"time"
 
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/config"
-	"github.com/RoyceAzure/lab/rj_kafka/kafka/consumer"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/config"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/consumer"
 	"github.com/RoyceAzure/rj/infra/elsearch"
 )
 
