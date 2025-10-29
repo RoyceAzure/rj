@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/RoyceAzure/rj/infra/elsearch"
-	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger_consumer"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/mq/logger_consumer"
 	"github.com/olivere/elastic/v7"
 )
 

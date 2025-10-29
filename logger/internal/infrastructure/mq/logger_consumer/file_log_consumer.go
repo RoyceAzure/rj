@@ -6,14 +6,14 @@ import (
 	"sync/atomic"
 
 	"github.com/RoyceAzure/rj/infra/mq/client"
-	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/zero_logger_adapter"
 	"github.com/RoyceAzure/rj/repo/file"
 )
 
 // 不使用DI
 type FileLoggerConsumer struct {
 	consumer   client.IConsumer
-	fileLogger logger.ILogger
+	fileLogger zero_logger_adapter.ILogger
 	closed     atomic.Bool // 添加狀態追踪
 }
 
@@ -23,7 +23,7 @@ func NewFileLoggerConsumer(logFilePath string) (*FileLoggerConsumer, error) {
 		return nil, err
 	}
 
-	fileLogger := logger.NewFileLogger(textFileDao)
+	fileLogger := zero_logger_adapter.NewFileLogger(textFileDao)
 
 	consumer, err := client.NewConsumerV2("file_consumer")
 	if err != nil {

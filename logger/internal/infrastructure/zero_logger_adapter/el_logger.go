@@ -1,4 +1,4 @@
-package logger
+package zero_logger_adapter
 
 import (
 	"encoding/json"

@@ -3,7 +3,7 @@ module github.com/RoyceAzure/rj/logger
 go 1.23.3
 
 require (
-	github.com/RoyceAzure/rj/infra v0.0.0-20250521062531-9c30dbeec695
+	github.com/RoyceAzure/rj/infra v0.0.0-20251026090421-8b0139dff87e
 	github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/go-playground/validator/v10 v10.24.0
@@ -16,7 +16,7 @@ require (
 )
 
 require (
-	github.com/RoyceAzure/lab/rj_kafka v0.0.0-20250922085633-43027dce708d
+	github.com/RoyceAzure/lab/rj_kafka v1.0.0
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mailru/easyjson v0.9.0 // indirect
+	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect

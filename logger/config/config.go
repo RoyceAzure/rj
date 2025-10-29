@@ -12,7 +12,7 @@ import (
 )
 
 type Config struct {
-	ServiceID         string `mapstructure:"SERVICEID"`
+	ModulerName       string `mapstructure:"MODULER_NAME"`
 	MongodbAddress    string `mapstructure:"MONGODB_ADDRESS"`
 	RedisQueueAddress string `mapstructure:"REDIS_Q_ADDRESS"`
 	MqExchangeKey     string `mapstructure:"MQ_EXCHANGE"`
@@ -24,9 +24,9 @@ type Config struct {
 	MqVHost           string `mapstructure:"MQ_VHOST"`
 	MqUser            string `mapstructure:"MQ_USER"`
 	MqPassword        string `mapstructure:"MQ_PASSWORD"`
-	ElSearchHost      string `mapstructure:"ELSEARCH_HOST"`
-	ElSearchPort      string `mapstructure:"ELSEARCH_PORT"`
-	ElSearchPassword  string `mapstructure:"ELSEARCH_PASSWIRD"`
+	ElSearchHost      string `mapstructure:"ELASTIC_HOST"`
+	ElSearchPort      string `mapstructure:"ELASTIC_PORT"`
+	ElSearchPassword  string `mapstructure:"ELASTIC_PASSWORD"`
 }
 
 var config_siongleton *ConfigSingleTon
@@ -73,13 +73,15 @@ func loadConfig() (cf *Config, err error) {
 	defer config_siongleton.mu.Unlock()
 
 	cf = &Config{}
-	viper.SetConfigFile(fmt.Sprintf("%s/.env", getProjectRoot("github.com/RoyceAzure/rj/logger")))
-	viper.AutomaticEnv()
-
+	viper.SetConfigFile(fmt.Sprintf("%s/.env", getProjectRoot("github.com/RoyceAzure/sexy_stock/logger")))
+	// 先讀取 .env 文件的配置
 	err = viper.ReadInConfig()
 	if err != nil {
 		return
 	}
+
+	// 再啟用環境變數，讓環境變數覆蓋 .env 文件的值
+	viper.AutomaticEnv()
 
 	err = viper.Unmarshal(cf)
 	if err != nil {

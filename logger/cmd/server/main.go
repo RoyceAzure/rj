@@ -1,64 +1,44 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/RoyceAzure/rj/infra/mq"
-	"github.com/RoyceAzure/rj/logger/client/consumer"
-	"github.com/RoyceAzure/rj/logger/config"
-	"github.com/rs/zerolog"
+	"github.com/RoyceAzure/rj/logger/internal/app"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/kafka"
 )
 
 func main() {
-	zerolog.TimeFieldFormat = time.RFC3339
-
-	cf := config.GetConfig()
-
-	err := mq.SelectConnFactory.Init(mq.MQConnParams{
-		MqHost:  cf.MqHost,
-		MqUser:  cf.MqUser,
-		MqPas:   cf.MqPassword,
-		MqPort:  cf.MqPort,
-		MqVHost: cf.MqVHost,
-	})
+	cfg := kafka.GetDefaultKafkaConfig()
+	app, err := app.NewKafkaLoggerApp(cfg, "http://localhost:9200", "password")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var logFactory consumer.ILoggerConsumerFactory
-
-	logFactory, err = consumer.NewElasticFactory(&consumer.LoggerConsumerConfig{
-		ElUrl: fmt.Sprintf("%s:%s", cf.ElSearchHost, cf.ElSearchPort),
-		ElPas: cf.ElSearchPassword,
-	})
-	if err != nil {
+	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}
 
-	loggerconsumer, err := logFactory.GetLoggerConsumer()
-	if err != nil {
-		log.Fatal(err)
+	// 監聽退出訊號
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// 等待退出訊號
+	<-sigChan
+	log.Println("Received shutdown signal")
+
+	// 優雅關閉
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := app.Stop(shutdownCtx); err != nil {
+		log.Printf("Shutdown error: %v", err)
+		os.Exit(1)
 	}
 
-	err = loggerconsumer.Start("local_file_logs")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
-
-	sig := <-sigCh
-	log.Printf("收到信號: %v, 開始優雅關閉", sig)
-
-	// 關閉資源
-	if err := loggerconsumer.Close(); err != nil {
-		log.Printf("關閉消費者時出錯: %v", err)
-	}
 	log.Printf("closed completed")
 }

@@ -7,17 +7,17 @@ import (
 
 	"github.com/RoyceAzure/rj/infra/elsearch"
 	"github.com/RoyceAzure/rj/infra/mq/client"
-	"github.com/RoyceAzure/rj/logger/internal/infrastructure/logger"
+	"github.com/RoyceAzure/rj/logger/internal/infrastructure/zero_logger_adapter"
 )
 
 type ElLoggerConsumer struct {
 	client.IConsumer
-	elLogger logger.ILogger
+	elLogger zero_logger_adapter.ILogger
 	closed   atomic.Bool // 添加狀態追踪
 }
 
 func NewElLoggerConsumer(elDao elsearch.IElSearchDao) (*ElLoggerConsumer, error) {
-	elLogger := logger.NewElLogger(elDao)
+	elLogger := zero_logger_adapter.NewElLogger(elDao)
 
 	consumer, err := client.NewConsumerV2("el_logger_consumer")
 	if err != nil {
