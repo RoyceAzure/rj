@@ -77,6 +77,7 @@ func NewKafkaWriter(cfg *config.Config) *kafka.Writer {
 		BatchSize:    cfg.BatchSize,
 		BatchTimeout: cfg.CommitInterval + time.Millisecond*100,
 		RequiredAcks: kafka.RequiredAcks(cfg.RequiredAcks),
+		Compression:  kafka.Lz4,
 	}
 }
 

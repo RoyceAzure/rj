@@ -14,13 +14,14 @@ import (
 )
 
 // for consumer  不需要接收來自zerolog的資訊
-type KafkaLogger struct {
-	cfg   *lab_config.Config
-	w     producer.Producer
-	logId atomic.Int64
+type KafkaLoggerWriter struct {
+	cfg        *lab_config.Config
+	p          producer.Producer
+	errorCount atomic.Int64
+	logId      atomic.Int64
 }
 
-func NewKafkaLogger(cfg *lab_config.Config) (*KafkaLogger, error) {
+func NewKafkaLoggerWriter(cfg *lab_config.Config) (*KafkaLoggerWriter, error) {
 	w := &kafka.Writer{
 		Addr:         kafka.TCP(cfg.Brokers...),
 		Topic:        cfg.Topic,
@@ -32,6 +33,7 @@ func NewKafkaLogger(cfg *lab_config.Config) (*KafkaLogger, error) {
 		WriteTimeout: 5 * time.Second,
 		// 設置重試
 		MaxAttempts: 3,
+		Compression: kafka.Lz4,
 	}
 
 	p, err := producer.NewConcurrencekafkaProducer(w, *cfg)
@@ -39,21 +41,26 @@ func NewKafkaLogger(cfg *lab_config.Config) (*KafkaLogger, error) {
 		return nil, err
 	}
 
-	return &KafkaLogger{
+	p.Start()
+	return &KafkaLoggerWriter{
 		cfg: cfg,
-		w:   p,
+		p:   p,
 	}, nil
 }
 
-func (kw *KafkaLogger) Write(p []byte) (n int, err error) {
+func (kw *KafkaLoggerWriter) GetErrorCount() int64 {
+	return kw.errorCount.Load()
+}
+
+func (kw *KafkaLoggerWriter) Write(p []byte) (n int, err error) {
 	if kw == nil {
 		return 0, fmt.Errorf("file logger is not init")
 	}
 
 	kw.logId.Add(int64(1))
-	kbuf := make([]byte, 0, 8)
+	kbuf := make([]byte, 8, 8)
 	binary.BigEndian.PutUint64(kbuf, uint64(kw.logId.Load()))
-	_, err = kw.w.Produce(context.Background(), []model.Message{
+	_, err = kw.p.Produce(context.Background(), []model.Message{
 		{
 			Key:   kbuf,
 			Value: p,
@@ -61,12 +68,13 @@ func (kw *KafkaLogger) Write(p []byte) (n int, err error) {
 	})
 
 	if err != nil {
+		kw.errorCount.Add(1)
 		return 0, err
 	}
 
 	return len(p), nil
 }
 
-func (fw *KafkaLogger) Close() error {
-	return fw.w.Close(time.Second * 15)
+func (fw *KafkaLoggerWriter) Close() error {
+	return fw.p.Close(time.Second * 15)
 }
