@@ -3,60 +3,71 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/RoyceAzure/lab/rj_kafka/pkg/config"
-	"github.com/RoyceAzure/lab/rj_kafka/pkg/consumer"
-	"github.com/RoyceAzure/rj/infra/elsearch"
+	kafka_consumer "github.com/RoyceAzure/lab/rj_kafka/pkg/consumer"
+	"github.com/RoyceAzure/rj/logger/client/consumer"
 	"github.com/RoyceAzure/rj/logger/internal/infrastructure/kafka"
 )
 
 type KafkaLoggerApp struct {
-	cfg       *config.Config
-	consumers []*consumer.Consumer
-	elDao     elsearch.IElSearchDao
+	cfg         *config.Config
+	consumers   []*kafka_consumer.Consumer
+	topicConfig map[string]interface{}
 }
 
-func NewKafkaLoggerApp(cfg *config.Config, elHost, elPas string) (*KafkaLoggerApp, error) {
-	elDao, err := setUpElDao(elHost, elPas)
+// NewKafkaLoggerApp 創建 KafkaLoggerApp
+//
+// cfg: kafka 配置
+// elHost: elasticsearch 主機
+// elPas: elasticsearch 密碼
+// m: topic 配置 例如：
+//
+//	"cleanup.policy":      "delete",
+//	"retention.ms":        "60000", // 1分鐘後自動刪除
+//	"min.insync.replicas": "1",
+//	"delete.retention.ms": "1000", // 標記刪除後1秒鐘清理
+func NewKafkaLoggerApp(cfg *config.Config, elHost, elPas string, m map[string]interface{}) (*KafkaLoggerApp, error) {
+	kafkaConsumerFactory, err := consumer.NewKafkaConsumerFactory(&consumer.LoggerConsumerConfig{
+		ElUrl:       elHost,
+		ElPas:       elPas,
+		KafkaConfig: cfg,
+	})
 	if err != nil {
 		return nil, err
 	}
+
+	var consumers []*kafka_consumer.Consumer
+	for i := 0; i < cfg.Partition; i++ {
+		consumer, err := kafkaConsumerFactory.GetLoggerConsumer()
+		if err != nil {
+			return nil, err
+		}
+		consumers = append(consumers, consumer)
+	}
+
 	return &KafkaLoggerApp{
-		cfg:       cfg,
-		consumers: make([]*consumer.Consumer, 0, cfg.Partition),
-		elDao:     elDao,
+		cfg:         cfg,
+		consumers:   consumers,
+		topicConfig: m,
 	}, nil
 }
 
-func setUpElDao(host, pas string) (*elsearch.ElSearchDao, error) {
-	// 初始化 ES
-	err := elsearch.InitELSearch(host, pas)
-	if err != nil {
-		return nil, err
-	}
-
-	dao, err := elsearch.GetInstance()
-	if err != nil {
-		return nil, err
-	}
-	return dao, nil
-}
-
+// 設置kafka topic 並啟動所有消費者
 func (k *KafkaLoggerApp) Start() error {
-	err := kafka.SetupKafkaTopic(k.cfg)
+	err := kafka.SetupKafkaTopic(k.cfg, k.topicConfig)
+
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < k.cfg.Partition; i++ {
-		c, err := kafka.NewKafkaElConsumer(k.cfg, k.elDao)
-		if err != nil {
-			return err
-		}
+	for i, c := range k.consumers {
+		log.Println("啟動消費者: ", i)
 		c.Start()
-		k.consumers = append(k.consumers, c)
 	}
+
 	return nil
 }
 
@@ -65,7 +76,7 @@ func (k *KafkaLoggerApp) Start() error {
 // will block until all consumers are closed or timeout
 func (k *KafkaLoggerApp) Stop(ctx context.Context) error {
 	for _, c := range k.consumers {
-		c.Close(time.Second * 10)
+		go c.Close(time.Second * 15)
 	}
 
 	allClosed := make(chan struct{})

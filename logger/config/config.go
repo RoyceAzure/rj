@@ -12,21 +12,26 @@ import (
 )
 
 type Config struct {
-	ModulerName       string `mapstructure:"MODULER_NAME"`
-	MongodbAddress    string `mapstructure:"MONGODB_ADDRESS"`
-	RedisQueueAddress string `mapstructure:"REDIS_Q_ADDRESS"`
-	MqExchangeKey     string `mapstructure:"MQ_EXCHANGE"`
-	MqBacktestingKey  string `mapstructure:"MQ_BACKTESTING_KEY"`
-	MqPreprocessKey   string `mapstructure:"MQ_PREPROCESS_KEY"`
-	LocalLogFileDir   string `mapstructure:"LOCAL_LOG_FILE_DIR"`
-	MqHost            string `mapstructure:"MQ_HOST"`
-	MqPort            string `mapstructure:"MQ_PORT"`
-	MqVHost           string `mapstructure:"MQ_VHOST"`
-	MqUser            string `mapstructure:"MQ_USER"`
-	MqPassword        string `mapstructure:"MQ_PASSWORD"`
-	ElSearchHost      string `mapstructure:"ELASTIC_HOST"`
-	ElSearchPort      string `mapstructure:"ELASTIC_PORT"`
-	ElSearchPassword  string `mapstructure:"ELASTIC_PASSWORD"`
+	ModulerName        string `mapstructure:"MODULER_NAME"`
+	MongodbAddress     string `mapstructure:"MONGODB_ADDRESS"`
+	RedisQueueAddress  string `mapstructure:"REDIS_Q_ADDRESS"`
+	MqExchangeKey      string `mapstructure:"MQ_EXCHANGE"`
+	MqBacktestingKey   string `mapstructure:"MQ_BACKTESTING_KEY"`
+	MqPreprocessKey    string `mapstructure:"MQ_PREPROCESS_KEY"`
+	LocalLogFileDir    string `mapstructure:"LOCAL_LOG_FILE_DIR"`
+	MqHost             string `mapstructure:"MQ_HOST"`
+	MqPort             string `mapstructure:"MQ_PORT"`
+	MqVHost            string `mapstructure:"MQ_VHOST"`
+	MqUser             string `mapstructure:"MQ_USER"`
+	MqPassword         string `mapstructure:"MQ_PASSWORD"`
+	ElSearchHost       string `mapstructure:"ELASTIC_HOST"`
+	ElSearchPort       string `mapstructure:"ELASTIC_PORT"`
+	ElSearchPassword   string `mapstructure:"ELASTIC_PASSWORD"`
+	KafkaBrokers       string `mapstructure:"KAFKA_BROKERS"`
+	KafkaTopic         string `mapstructure:"KAFKA_TOPIC"`
+	KafkaConsumerGroup string `mapstructure:"KAFKA_CONSUMER_GROUP"`
+	KafkaPartition     int    `mapstructure:"KAFKA_PARTITION"`
+	KafkaBatchSize     int    `mapstructure:"KAFKA_BATCH_SIZE"`
 }
 
 var config_siongleton *ConfigSingleTon
@@ -73,7 +78,7 @@ func loadConfig() (cf *Config, err error) {
 	defer config_siongleton.mu.Unlock()
 
 	cf = &Config{}
-	viper.SetConfigFile(fmt.Sprintf("%s/.env", getProjectRoot("github.com/RoyceAzure/sexy_stock/logger")))
+	viper.SetConfigFile(fmt.Sprintf("%s/.env", getProjectRoot("github.com/RoyceAzure/rj/logger")))
 	// 先讀取 .env 文件的配置
 	err = viper.ReadInConfig()
 	if err != nil {

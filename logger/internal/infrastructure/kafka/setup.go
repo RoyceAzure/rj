@@ -31,15 +31,14 @@ import (
 //	cfg.Partition = 3
 func GetDefaultKafkaConfig() *config.Config {
 	cfg := config.DefaultConfig()
-	cfg.Partition = 6
 	cfg.Timeout = time.Second
-	cfg.BatchSize = 10000
-	cfg.RequiredAcks = 0 //writer不需要等待確認
-	cfg.CommitInterval = time.Millisecond * 500
+	cfg.BatchSize = 8000
+	cfg.RequiredAcks = 1
+	cfg.CommitInterval = time.Millisecond * 300
 	return cfg
 }
 
-func SetupKafkaTopic(cfg *config.Config) error {
+func SetupKafkaTopic(cfg *config.Config, m map[string]interface{}) error {
 	adminClient, err := admin.NewAdmin(cfg.Brokers)
 	if err != nil {
 		return err
@@ -50,12 +49,7 @@ func SetupKafkaTopic(cfg *config.Config) error {
 		Name:              cfg.Topic,
 		Partitions:        cfg.Partition,
 		ReplicationFactor: 3,
-		Configs: map[string]interface{}{
-			"cleanup.policy":      "delete",
-			"retention.ms":        "60000", // 1分鐘後自動刪除
-			"min.insync.replicas": "2",
-			"delete.retention.ms": "1000", // 標記刪除後1秒鐘清理
-		},
+		Configs:           m,
 	})
 	if err != nil {
 		return err
