@@ -30,4 +30,5 @@
 **/temp
 **/*.env
 
+**/data/
 **/vendor/
