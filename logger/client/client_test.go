@@ -97,6 +97,7 @@ func setupTestEnvironment(t *testing.T, cfg *kafka_config.Config) func() {
 }
 
 // 似乎有訊息在zero logger階段中消失，並沒有進到kafka producer buffer裡面
+// 測試前請先設定kafka topics，或者啟動server端，目前是用來測試server端的
 func TestLoggerProduce(t *testing.T) {
 	testCases := []struct {
 		name                  string
