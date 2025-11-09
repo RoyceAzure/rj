@@ -10,14 +10,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/RoyceAzure/rj/logger/client/app"
 	"github.com/RoyceAzure/rj/logger/config"
-	"github.com/RoyceAzure/rj/logger/internal/app"
-	"github.com/RoyceAzure/rj/logger/internal/infrastructure/kafka"
 )
 
 func main() {
 	envConfig := config.GetConfig()
-	cfg := kafka.GetDefaultKafkaConfig()
+	cfg := config.GetDefaultKafkaConfig()
 	cfg.Brokers = strings.Split(envConfig.KafkaBrokers, ",")
 	cfg.Topic = envConfig.KafkaTopic
 	cfg.ConsumerGroup = envConfig.KafkaConsumerGroup

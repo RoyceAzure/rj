@@ -28,6 +28,7 @@ type LoggerProducerConfig struct {
 	Project         string         `json:"project"`                         // 非必填
 	LogFileSavePath string         //for file logger
 	KafkaConfig     *config.Config //for kafka logger
+	IsOutPutStd     bool           // for stdout
 }
 
 func (p *LoggerProducerConfig) Validate() error {
@@ -96,7 +97,7 @@ func (e *FileLoggerFactory) createFileLogger() (*zerolog.Logger, error) {
 	}
 	producer.Start()
 
-	zeroLogger := setUpClientLToZeroL(logger, e.config, true)
+	zeroLogger := setUpClientLToZeroL(logger, e.config)
 	return &zeroLogger, nil
 }
 
@@ -142,7 +143,7 @@ func (e *ElasticFactory) createLoggerProcuder() (*zerolog.Logger, error) {
 	}
 	producer.Start()
 
-	zeroLogger := setUpClientLToZeroL(el_logger, e.config, false)
+	zeroLogger := setUpClientLToZeroL(el_logger, e.config)
 	return &zeroLogger, nil
 }
 
@@ -154,12 +155,6 @@ var (
 // Kafka 工廠
 type KafkaLoggerFactory struct {
 	config *LoggerProducerConfig
-}
-
-func NewKafkaLoggerFactory(config *LoggerProducerConfig) (*KafkaLoggerFactory, error) {
-	return &KafkaLoggerFactory{
-		config: config,
-	}, nil
 }
 
 // 紀錄zerolog logger的錯誤次數
@@ -179,6 +174,11 @@ func (k *KafkaLoggerAdapter) GetErrorCount() int64 {
 	return k.kafkaLogger.GetErrorCount()
 }
 
+func NewKafkaLoggerFactory(config *LoggerProducerConfig) (*KafkaLoggerFactory, error) {
+	return &KafkaLoggerFactory{
+		config: config,
+	}, nil
+}
 func (k *KafkaLoggerFactory) GetLoggerProcuder() (*KafkaLoggerAdapter, error) {
 	kmu.RLock()
 	if kafkaLogger != nil {
@@ -208,15 +208,15 @@ func (k *KafkaLoggerFactory) createLoggerProcuder() (*KafkaLoggerAdapter, error)
 		return nil, fmt.Errorf("failed to create kafka logger: %w", err)
 	}
 
-	zeroLogger := setUpClientLToZeroL(kafkaLoggerWriter, k.config, true)
+	zeroLogger := setUpClientLToZeroL(kafkaLoggerWriter, k.config)
 
 	return NewKafkaLoggerAdapter(&zeroLogger, kafkaLoggerWriter), nil
 }
 
 // ILoggerProcuder 轉換成zero logger
-func setUpClientLToZeroL(logger logger_producer.ILoggerProcuder, config *LoggerProducerConfig, isAddConsole bool) zerolog.Logger {
+func setUpClientLToZeroL(logger logger_producer.ILoggerProcuder, config *LoggerProducerConfig) zerolog.Logger {
 	var multiLogger zerolog.LevelWriter
-	if isAddConsole {
+	if config.IsOutPutStd {
 		multiLogger = zerolog.MultiLevelWriter(
 			zerolog.ConsoleWriter{Out: os.Stdout},
 			logger,

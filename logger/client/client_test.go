@@ -126,13 +126,14 @@ func TestLoggerProduce(t *testing.T) {
 			cfg.ConsumerGroup = "log_consumer_group"
 			cfg.Timeout = time.Second
 			cfg.BatchSize = 8000
-			cfg.CommitInterval = time.Millisecond * 300
+			cfg.CommitInterval = time.Millisecond * 200
 			cfg.RequiredAcks = 1
 
 			cfg.Topic = "log"
 
 			kafkaLoggerFactory, err := producer.NewKafkaLoggerFactory(&producer.LoggerProducerConfig{
 				KafkaConfig: cfg,
+				IsOutPutStd: false,
 			})
 			require.NoError(t, err)
 
@@ -142,6 +143,9 @@ func TestLoggerProduce(t *testing.T) {
 				require.NoError(t, err)
 				loggers = append(loggers, logger)
 			}
+
+			t.Log("等待前置作業初始化完成...")
+			time.Sleep(time.Second * 10) // 等待前置作業初始化完成
 
 			g := new(errgroup.Group)
 			MsgsCh := testCase.generateTestMsg(testCase.testMsgs)
@@ -216,7 +220,7 @@ func TestIntergrationTest(t *testing.T) {
 			cfg.ConsumerGroup = LogConsumerGropu
 			cfg.Timeout = time.Second
 			cfg.BatchSize = 8000
-			cfg.CommitInterval = time.Millisecond * 300
+			cfg.CommitInterval = time.Millisecond * 200
 			cfg.RequiredAcks = 1
 			cfg.Topic = LogTopicName
 			closeEnv := setupTestEnvironment(t, cfg)

@@ -23,7 +23,10 @@ func (fw *ElLogger) Write(p []byte) (n int, err error) {
 	}
 	var logEntry map[string]any
 
-	err = json.Unmarshal(p, &logEntry)
+	copyP := make([]byte, len(p))
+	copy(copyP, p) //避免zero logger在寫入時的競爭問題
+
+	err = json.Unmarshal(copyP, &logEntry)
 	if err != nil {
 		return 0, err
 	}

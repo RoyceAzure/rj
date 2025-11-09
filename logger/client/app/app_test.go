@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/RoyceAzure/lab/rj_kafka/pkg/admin"
+	"github.com/RoyceAzure/lab/rj_kafka/pkg/config"
 	kafka_config "github.com/RoyceAzure/lab/rj_kafka/pkg/config"
 	"github.com/RoyceAzure/lab/rj_kafka/pkg/model"
 	"github.com/RoyceAzure/rj/logger/client/producer"
@@ -60,7 +61,7 @@ func TestIntergrationApp(t *testing.T) {
 			testMsgs:              100000,
 			loggerNum:             3000,
 			each_publish_num:      2,
-			each_publish_duration: 500 * time.Millisecond,
+			each_publish_duration: 20 * time.Millisecond,
 			generateTestMsg:       generateTestMessage,
 			earilyStop:            time.Second * 20,
 			handlerSuccessfunc: func(successMsgsChan chan kafka.Message, successDeposeCount *atomic.Uint32) func(kafka.Message) {
@@ -88,13 +89,14 @@ func TestIntergrationApp(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			cfg = kafka_config.DefaultConfig()
 			cfg.Brokers = []string{"localhost:9092", "localhost:9093", "localhost:9094"}
-			cfg.Partition = 12
+			cfg.Partition = 3
 			cfg.ConsumerGroup = LogConsumerGropu
 			cfg.Timeout = time.Second
-			cfg.BatchSize = 8000
-			cfg.CommitInterval = time.Millisecond * 300
+			cfg.BatchSize = 10000
+			cfg.CommitInterval = time.Millisecond * 200
 			cfg.RequiredAcks = 1
 			cfg.Topic = LogTopicName
+			cfg.LogLevel = config.DebugLevel
 
 			successMsgsChan := make(chan kafka.Message, testCase.testMsgs)
 			failedMsgsChan := make(chan kafka.Message, testCase.testMsgs)
@@ -120,6 +122,7 @@ func TestIntergrationApp(t *testing.T) {
 
 			kafkaLoggerFactory, err := producer.NewKafkaLoggerFactory(&producer.LoggerProducerConfig{
 				KafkaConfig: cfg,
+				IsOutPutStd: false,
 			})
 			require.NoError(t, err)
 
@@ -128,13 +131,17 @@ func TestIntergrationApp(t *testing.T) {
 
 			g := new(errgroup.Group)
 			MsgsCh := testCase.generateTestMsg(testCase.testMsgs)
-			t.Log("開始發送訊息...")
 			var loggers []*producer.KafkaLoggerAdapter
 			for i := 0; i < testCase.loggerNum; i++ {
 				logger, err := kafkaLoggerFactory.GetLoggerProcuder()
 				require.NoError(t, err)
 				loggers = append(loggers, logger)
 			}
+
+			t.Log("等待所有logger初始化完成...")
+			time.Sleep(time.Second * 10) // 等待所有消費者處理完
+
+			t.Log("開始發送訊息...")
 
 			for i := 0; i < testCase.loggerNum; i++ {
 				g.Go(func() error {
@@ -153,7 +160,7 @@ func TestIntergrationApp(t *testing.T) {
 			require.NoError(t, err)
 
 			t.Log("等待所有消費者處理完...")
-			time.Sleep(time.Second * 20) // 等待所有消費者處理完
+			time.Sleep(time.Second * 10) // 等待所有消費者處理完
 
 			err = app.Stop(context.Background())
 			require.NoError(t, err)
@@ -186,8 +193,14 @@ func TestIntergrationApp(t *testing.T) {
 			shouldConsumerMsgs := len(allSuccessMsgs) + len(allFailedMsgs) + int(failedDeposeCount.Load())
 			missingConsumerMsgs := testCase.testMsgs - shouldConsumerMsgs
 
+			zeroFailedCount := 0
+			for i := 0; i < testCase.loggerNum; i++ {
+				zeroFailedCount += int(loggers[i].GetErrorCount())
+			}
+
 			t.Log("consumer總共處理的 msgs數量: ", len(allSuccessMsgs)+len(allFailedMsgs))
 			t.Log("失敗發送的 msgs數量: ", failedDeposeCount.Load())
+			t.Logf("zero logger失敗發送的 msgs數量: %d", zeroFailedCount)
 			t.Log("損失的訊息數量: ", missingConsumerMsgs)
 			require.Less(t, missingConsumerMsgs, int(float64(testCase.testMsgs)*0.05), "損失的訊息數量不應該超過5%")
 		})
