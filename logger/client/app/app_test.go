@@ -60,8 +60,8 @@ func TestIntergrationApp(t *testing.T) {
 			name:                  "app test",
 			testMsgs:              100000,
 			loggerNum:             3000,
-			each_publish_num:      2,
-			each_publish_duration: 20 * time.Millisecond,
+			each_publish_num:      1,
+			each_publish_duration: 1 * time.Millisecond,
 			generateTestMsg:       generateTestMessage,
 			earilyStop:            time.Second * 20,
 			handlerSuccessfunc: func(successMsgsChan chan kafka.Message, successDeposeCount *atomic.Uint32) func(kafka.Message) {
@@ -92,7 +92,7 @@ func TestIntergrationApp(t *testing.T) {
 			cfg.Partition = 3
 			cfg.ConsumerGroup = LogConsumerGropu
 			cfg.Timeout = time.Second
-			cfg.BatchSize = 10000
+			cfg.BatchSize = 8000
 			cfg.CommitInterval = time.Millisecond * 200
 			cfg.RequiredAcks = 1
 			cfg.Topic = LogTopicName

@@ -12,8 +12,16 @@ github.com/RoyceAzure/lab/rj_kafka v1.3.2 h1:w/pjQMfDwWdWl2ybFdBWSL3oylpJPhh6ode
 github.com/RoyceAzure/lab/rj_kafka v1.3.2/go.mod h1:LSYzSmeV1pZPevg9AFk15TpJW5hmlQiVX7IL7twpmU0=
 github.com/RoyceAzure/lab/rj_kafka v1.3.3 h1:URxnLt0t7Dlcr1kDJdILpI6RBR0Qtq05FsCtKnSxWTk=
 github.com/RoyceAzure/lab/rj_kafka v1.3.3/go.mod h1:LSYzSmeV1pZPevg9AFk15TpJW5hmlQiVX7IL7twpmU0=
+github.com/RoyceAzure/lab/rj_kafka v1.3.4 h1:EigJW9wZGhleCzOU1aVb1r24FV1nOIYPWEhEsemi6f8=
+github.com/RoyceAzure/lab/rj_kafka v1.3.4/go.mod h1:ETnVd5PRaREKg3tw939jeq8aES3JCfDDhd4WUXSfOsM=
+github.com/RoyceAzure/lab/rj_kafka v1.3.5 h1:IsbJcoTvQpgyRZ3vcTO5Z3N1r1oWlszJMrIohCnHsvg=
+github.com/RoyceAzure/lab/rj_kafka v1.3.5/go.mod h1:ETnVd5PRaREKg3tw939jeq8aES3JCfDDhd4WUXSfOsM=
+github.com/RoyceAzure/lab/rj_kafka v1.3.6 h1:FqhJjhXIxMNqe6vmlX4aTI2+6sDnpnYaUnPJUZURFRI=
+github.com/RoyceAzure/lab/rj_kafka v1.3.6/go.mod h1:ETnVd5PRaREKg3tw939jeq8aES3JCfDDhd4WUXSfOsM=
 github.com/RoyceAzure/rj/infra v0.0.0-20251026090421-8b0139dff87e h1:vGzR0n37/YxbMW9Nou8mPybMPPyYghODqMK1EFKUHqU=
 github.com/RoyceAzure/rj/infra v0.0.0-20251026090421-8b0139dff87e/go.mod h1:O7TpWmyS4dV95qyUY/T786VyOsnhf/69KX9SwjDHvKc=
+github.com/RoyceAzure/rj/infra v1.0.0 h1:iHniEgbnvELr5Ewg6cIvNtTmCatqAwdB8yZQr8qxSU0=
+github.com/RoyceAzure/rj/infra v1.0.0/go.mod h1:O7TpWmyS4dV95qyUY/T786VyOsnhf/69KX9SwjDHvKc=
 github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb h1:0nxwS8CWEnbWrJyk8mI/AsmX/oWESLLmWQpf5RW56jw=
 github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb/go.mod h1:XDiKP8ZJOSdRb7DlxQVv29TJ88r5Q4DqWlYWGnAwEkc=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
