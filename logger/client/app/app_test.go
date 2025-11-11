@@ -12,6 +12,7 @@ import (
 	kafka_config "github.com/RoyceAzure/lab/rj_kafka/pkg/config"
 	"github.com/RoyceAzure/lab/rj_kafka/pkg/model"
 	"github.com/RoyceAzure/rj/logger/client/producer"
+	"github.com/rs/zerolog"
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
@@ -131,7 +132,7 @@ func TestIntergrationApp(t *testing.T) {
 
 			g := new(errgroup.Group)
 			MsgsCh := testCase.generateTestMsg(testCase.testMsgs)
-			var loggers []*producer.KafkaLoggerAdapter
+			var loggers []*zerolog.Logger
 			for i := 0; i < testCase.loggerNum; i++ {
 				logger, err := kafkaLoggerFactory.GetLoggerProcuder()
 				require.NoError(t, err)
@@ -193,14 +194,8 @@ func TestIntergrationApp(t *testing.T) {
 			shouldConsumerMsgs := len(allSuccessMsgs) + len(allFailedMsgs) + int(failedDeposeCount.Load())
 			missingConsumerMsgs := testCase.testMsgs - shouldConsumerMsgs
 
-			zeroFailedCount := 0
-			for i := 0; i < testCase.loggerNum; i++ {
-				zeroFailedCount += int(loggers[i].GetErrorCount())
-			}
-
 			t.Log("consumer總共處理的 msgs數量: ", len(allSuccessMsgs)+len(allFailedMsgs))
 			t.Log("失敗發送的 msgs數量: ", failedDeposeCount.Load())
-			t.Logf("zero logger失敗發送的 msgs數量: %d", zeroFailedCount)
 			t.Log("損失的訊息數量: ", missingConsumerMsgs)
 			require.Less(t, missingConsumerMsgs, int(float64(testCase.testMsgs)*0.05), "損失的訊息數量不應該超過5%")
 		})

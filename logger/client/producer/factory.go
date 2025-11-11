@@ -148,12 +148,62 @@ func (e *ElasticFactory) createLoggerProcuder() (*zerolog.Logger, error) {
 }
 
 var (
-	kafkaLogger *KafkaLoggerAdapter
+	kafkaLogger *zerolog.Logger
 	kmu         sync.RWMutex
 )
 
 // Kafka 工廠
 type KafkaLoggerFactory struct {
+	config *LoggerProducerConfig
+}
+
+func NewKafkaLoggerFactory(config *LoggerProducerConfig) (*KafkaLoggerFactory, error) {
+	return &KafkaLoggerFactory{
+		config: config,
+	}, nil
+}
+
+func (k *KafkaLoggerFactory) GetLoggerProcuder() (*zerolog.Logger, error) {
+	kmu.RLock()
+	if kafkaLogger != nil {
+		return kafkaLogger, nil
+	}
+	kmu.RUnlock()
+
+	kmu.Lock()
+	if kafkaLoggerAdapter != nil {
+		kmu.Unlock()
+		return kafkaLogger, nil
+	}
+	logger, err := k.createLoggerProcuder()
+	if err != nil {
+		return nil, err
+	}
+
+	kafkaLogger = logger
+	kmu.Unlock()
+	return kafkaLogger, nil
+}
+
+func (k *KafkaLoggerFactory) createLoggerProcuder() (*zerolog.Logger, error) {
+	kafkaLoggerWriter, err := zero_logger_adapter.NewKafkaLoggerWriter(k.config.KafkaConfig)
+	if err != nil {
+		kafkaLoggerWriter.Close()
+		return nil, fmt.Errorf("failed to create kafka logger: %w", err)
+	}
+
+	zeroLogger := setUpClientLToZeroL(kafkaLoggerWriter, k.config)
+
+	return &zeroLogger, nil
+}
+
+var (
+	kafkaLoggerAdapter *KafkaLoggerAdapter
+	kamu               sync.RWMutex
+)
+
+// Kafka 工廠
+type KafkaLoggerAdapterFactory struct {
 	config *LoggerProducerConfig
 }
 
@@ -174,34 +224,34 @@ func (k *KafkaLoggerAdapter) GetErrorCount() int64 {
 	return k.kafkaLogger.GetErrorCount()
 }
 
-func NewKafkaLoggerFactory(config *LoggerProducerConfig) (*KafkaLoggerFactory, error) {
-	return &KafkaLoggerFactory{
+func NewKafkaLoggerAdapterFactory(config *LoggerProducerConfig) (*KafkaLoggerAdapterFactory, error) {
+	return &KafkaLoggerAdapterFactory{
 		config: config,
 	}, nil
 }
-func (k *KafkaLoggerFactory) GetLoggerProcuder() (*KafkaLoggerAdapter, error) {
-	kmu.RLock()
-	if kafkaLogger != nil {
-		return kafkaLogger, nil
+func (k *KafkaLoggerAdapterFactory) GetLoggerProcuder() (*KafkaLoggerAdapter, error) {
+	kamu.RLock()
+	if kafkaLoggerAdapter != nil {
+		return kafkaLoggerAdapter, nil
 	}
-	kmu.RUnlock()
+	kamu.RUnlock()
 
-	kmu.Lock()
-	if kafkaLogger != nil {
-		kmu.Unlock()
-		return kafkaLogger, nil
+	kamu.Lock()
+	if kafkaLoggerAdapter != nil {
+		kamu.Unlock()
+		return kafkaLoggerAdapter, nil
 	}
 	logger, err := k.createLoggerProcuder()
 	if err != nil {
 		return nil, err
 	}
 
-	kafkaLogger = logger
-	kmu.Unlock()
-	return kafkaLogger, nil
+	kafkaLoggerAdapter = logger
+	kamu.Unlock()
+	return kafkaLoggerAdapter, nil
 }
 
-func (k *KafkaLoggerFactory) createLoggerProcuder() (*KafkaLoggerAdapter, error) {
+func (k *KafkaLoggerAdapterFactory) createLoggerProcuder() (*KafkaLoggerAdapter, error) {
 	kafkaLoggerWriter, err := zero_logger_adapter.NewKafkaLoggerWriter(k.config.KafkaConfig)
 	if err != nil {
 		kafkaLoggerWriter.Close()

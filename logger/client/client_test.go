@@ -13,6 +13,7 @@ import (
 	"github.com/RoyceAzure/lab/rj_kafka/pkg/model"
 	"github.com/RoyceAzure/rj/logger/client/consumer"
 	"github.com/RoyceAzure/rj/logger/client/producer"
+	"github.com/rs/zerolog"
 	"github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
@@ -137,7 +138,7 @@ func TestLoggerProduce(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			var loggers []*producer.KafkaLoggerAdapter
+			var loggers []*zerolog.Logger
 			for i := 0; i < testCase.loggerNum; i++ {
 				logger, err := kafkaLoggerFactory.GetLoggerProcuder()
 				require.NoError(t, err)
@@ -165,7 +166,6 @@ func TestLoggerProduce(t *testing.T) {
 			err = g.Wait()
 			time.Sleep(time.Second * 20) // 等待producer處理完
 			t.Log("發送訊息完成...")
-			t.Log("error count: ", loggers[0].GetErrorCount())
 			require.NoError(t, err)
 			t.Log("發送訊息完成...")
 		})
@@ -263,7 +263,7 @@ func TestIntergrationTest(t *testing.T) {
 			g := new(errgroup.Group)
 			MsgsCh := testCase.generateTestMsg(testCase.testMsgs)
 			t.Log("開始發送訊息...")
-			var loggers []*producer.KafkaLoggerAdapter
+			var loggers []*zerolog.Logger
 			for i := 0; i < testCase.loggerNum; i++ {
 				logger, err := kafkaLoggerFactory.GetLoggerProcuder()
 				require.NoError(t, err)
