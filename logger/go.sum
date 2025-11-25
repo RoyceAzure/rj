@@ -1,5 +1,5 @@
-github.com/RoyceAzure/lab/rj_kafka v1.3.7 h1:UZln/lHLNbQvIooz2BYsWhbseAkrkZ0aOMc02bGo2O0=
-github.com/RoyceAzure/lab/rj_kafka v1.3.7/go.mod h1:ETnVd5PRaREKg3tw939jeq8aES3JCfDDhd4WUXSfOsM=
+github.com/RoyceAzure/lab/rj_kafka v1.3.8 h1:Fa1sW1DR7F4/QN6KBe/gcHieiAH/ZjLOm582Crg7GF8=
+github.com/RoyceAzure/lab/rj_kafka v1.3.8/go.mod h1:ETnVd5PRaREKg3tw939jeq8aES3JCfDDhd4WUXSfOsM=
 github.com/RoyceAzure/rj/infra v1.0.0 h1:iHniEgbnvELr5Ewg6cIvNtTmCatqAwdB8yZQr8qxSU0=
 github.com/RoyceAzure/rj/infra v1.0.0/go.mod h1:O7TpWmyS4dV95qyUY/T786VyOsnhf/69KX9SwjDHvKc=
 github.com/RoyceAzure/rj/repo v0.0.0-20250209073543-da18afcaa1cb h1:0nxwS8CWEnbWrJyk8mI/AsmX/oWESLLmWQpf5RW56jw=
