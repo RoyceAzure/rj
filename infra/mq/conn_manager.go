@@ -21,11 +21,12 @@ type IMQConnManager interface {
 }
 
 type MQConnParams struct {
-	MqHost  string
-	MqPort  string
-	MqUser  string
-	MqPas   string
-	MqVHost string
+	MqHost     string
+	MqPort     string
+	MqUser     string
+	MqPas      string
+	MqVHost    string
+	ClientName string //用於記錄是哪個client的連線
 }
 
 // 要能自己處理channel  透過connect factory
@@ -77,7 +78,7 @@ func (r *MQSelectConnManager) Connect() error {
 	config := amqp.Config{
 		Dial: amqp.DefaultDial(time.Second * 5),
 		Properties: amqp.Table{
-			"connection_name": "rj_mq_conn_manager",
+			"connection_name": "rj_mq_conn_manager - " + r.params.ClientName,
 		},
 	}
 
