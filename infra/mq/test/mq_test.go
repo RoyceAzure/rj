@@ -22,7 +22,7 @@ func TestMQ(t *testing.T) {
 	consumer, err := client.NewConsumerV2("test")
 	require.NoError(t, err)
 
-	consumer.Consume("local_file_logs", func(msg []byte) error {
+	consumer.Consume("local_file_logs", "test", func(msg []byte) error {
 		fmt.Println(string(msg))
 		return nil
 	})

@@ -25,7 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	consumer.Consume("local_file_logs", func(msg []byte) error {
+	consumer.Consume("local_file_logs", "test", func(msg []byte) error {
 		log.Println(string(msg))
 		return nil
 	})

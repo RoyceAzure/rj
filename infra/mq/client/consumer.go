@@ -9,9 +9,9 @@ import (
 
 type IConsumer interface {
 	//非阻塞消費消息
-	Consume(queueName string, handler func([]byte) error) error
+	Consume(queueName, tag string, handler func([]byte) error) error
 	Close() error
-	ReStart(queueName string, handler func([]byte) error) error
+	ReStart(queueName, tag string, handler func([]byte) error) error
 }
 
 type ConsumerV2 struct {
@@ -33,10 +33,18 @@ func NewConsumerV2(name string) (*ConsumerV2, error) {
 }
 
 // 非阻塞消費消息
-func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) error {
+// params:
+//
+//		queueName: 佇列名稱
+//		tag: 消費者標籤
+//		handler: 處理消息的函數
+//
+//	return:
+//	 	1. error
+func (c *ConsumerV2) Consume(queueName, tag string, handler func([]byte) error) error {
 	go func() {
 		for {
-			msgs, err := c.setChannel(queueName)
+			msgs, err := c.setChannel(queueName, tag)
 			if err != nil {
 				fmt.Printf("Consumer %s_%s, 設置channel失敗, 錯誤訊息: %v", c.name, c.id, err)
 				c.close()
@@ -62,7 +70,14 @@ func (c *ConsumerV2) Consume(queueName string, handler func([]byte) error) error
 	return nil
 }
 
-func (c *ConsumerV2) setChannel(queueName string) (<-chan amqp.Delivery, error) {
+// 設置channel
+//
+//		queueName: 佇列名稱
+//		tag: 消費者標籤
+//
+//		return:
+//	 	1. channel
+func (c *ConsumerV2) setChannel(queueName, tag string) (<-chan amqp.Delivery, error) {
 	if queueName == "" {
 		return nil, fmt.Errorf("invalid parameters: queueName cannot be empty")
 	}
@@ -79,7 +94,7 @@ func (c *ConsumerV2) setChannel(queueName string) (<-chan amqp.Delivery, error) 
 	// 開始消費訊息
 	msgs, err := c.channel.Consume(
 		queueName, // 佇列名稱
-		"",        // 消費者標籤
+		tag,       // 消費者標籤
 		false,     // 自動確認
 		false,     // 獨佔
 		false,     // no-local
@@ -123,13 +138,13 @@ func (c *ConsumerV2) consume(msgs <-chan amqp.Delivery, handler func([]byte) err
 }
 
 // 只有當consumer處於Stop狀態時 才會執行重啟
-func (c *ConsumerV2) ReStart(queueName string, handler func([]byte) error) error {
+func (c *ConsumerV2) ReStart(queueName, tag string, handler func([]byte) error) error {
 	err := c.reStart()
 	if err != nil {
 		return err
 	}
 
-	c.Consume(queueName, handler)
+	c.Consume(queueName, tag, handler)
 	return nil
 }
 
