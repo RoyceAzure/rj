@@ -12,10 +12,10 @@ import (
 )
 
 type AwsEmailSenderConfig struct {
-	senderName string
-	accessKey  string
-	secretKey  string
-	region     string
+	SenderName string
+	AccessKey  string
+	SecretKey  string
+	Region     string
 }
 
 type AwsEmailSender struct {
@@ -24,10 +24,10 @@ type AwsEmailSender struct {
 }
 
 func NewAwsEmailSender(cf AwsEmailSenderConfig) (*AwsEmailSender, error) {
-	creds := credentials.NewStaticCredentialsProvider(cf.accessKey, cf.secretKey, "")
+	creds := credentials.NewStaticCredentialsProvider(cf.AccessKey, cf.SecretKey, "")
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithCredentialsProvider(creds),
-		config.WithRegion(cf.region),
+		config.WithRegion(cf.Region),
 	)
 	if err != nil {
 		log.Fatalf("無法載入 AWS 設定: %v", err)
@@ -52,7 +52,7 @@ func (a *AwsEmailSender) SendEmail(
 ) error {
 	charSet := "UTF-8"
 	input := &ses.SendEmailInput{
-		Source: aws.String(a.config.senderName),
+		Source: aws.String(a.config.SenderName),
 		Destination: &types.Destination{
 			ToAddresses: to,
 		},

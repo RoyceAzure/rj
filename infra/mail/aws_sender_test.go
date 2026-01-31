@@ -9,10 +9,10 @@ import (
 // 同 package 可建立 AwsEmailSenderConfig（未匯出欄位）
 func testAwsConfig() AwsEmailSenderConfig {
 	return AwsEmailSenderConfig{
-		senderName: "",
-		accessKey:  "",
-		secretKey:  "",
-		region:     "",
+		SenderName: "",
+		AccessKey:  "",
+		SecretKey:  "",
+		Region:     "",
 	}
 }
 
@@ -28,7 +28,7 @@ func TestNewAwsEmailSender(t *testing.T) {
 
 func TestNewAwsEmailSender_EmptyRegion(t *testing.T) {
 	cf := testAwsConfig()
-	cf.region = ""
+	cf.Region = ""
 
 	// 空 region 可能導致 LoadDefaultConfig 失敗並 log.Fatalf，此測試僅在未 exit 時驗證
 	sender, err := NewAwsEmailSender(cf)

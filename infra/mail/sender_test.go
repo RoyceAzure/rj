@@ -19,9 +19,9 @@ func TestNewGmailSender(t *testing.T) {
 	// 確認可轉型為 GmailSender 且欄位正確
 	gs, ok := sender.(*GmailSender)
 	require.True(t, ok)
-	require.Equal(t, name, gs.name)
-	require.Equal(t, from, gs.fromEmailAddress)
-	require.Equal(t, password, gs.fromEmailPassword)
+	require.Equal(t, name, gs.Name)
+	require.Equal(t, from, gs.FromEmailAddress)
+	require.Equal(t, password, gs.FromEmailPassword)
 }
 
 func TestGmailSender_SendEmail_AttachmentFileNotFound(t *testing.T) {

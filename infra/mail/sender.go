@@ -24,9 +24,9 @@ type EmailSender interface {
 }
 
 type GmailSender struct {
-	name              string
-	fromEmailAddress  string
-	fromEmailPassword string
+	Name              string
+	FromEmailAddress  string
+	FromEmailPassword string
 }
 
 func NewGmailSender(name string, fromEmailAddress string, fromEmailPassword string) EmailSender {
@@ -49,7 +49,7 @@ func (sender GmailSender) SendEmail(
 	attachFiles []string,
 ) error {
 	e := email.NewEmail()
-	e.From = fmt.Sprintf("%s <%s>", sender.name, sender.fromEmailAddress)
+	e.From = fmt.Sprintf("%s <%s>", sender.Name, sender.FromEmailAddress)
 	e.Subject = subject
 	e.HTML = []byte(content)
 	e.To = to
@@ -63,6 +63,6 @@ func (sender GmailSender) SendEmail(
 		}
 	}
 
-	smtpAuth := smtp.PlainAuth("", sender.fromEmailAddress, sender.fromEmailPassword, smtpAuthAddress)
+	smtpAuth := smtp.PlainAuth("", sender.FromEmailAddress, sender.FromEmailPassword, smtpAuthAddress)
 	return e.Send(smtpServerAddress, smtpAuth)
 }
