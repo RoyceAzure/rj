@@ -1,12 +1,18 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/RoyceAzure/rj/infra/mq"
 	"github.com/RoyceAzure/rj/infra/mq/constant"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -137,4 +143,35 @@ func (b *BaseClient) reSet() error {
 	}
 
 	return nil
+}
+
+type AwsClientConfig struct {
+	Endpoint  string // ARN or URL
+	Region    string
+	AccessKey string
+	SecretKey string
+	FilterKey string // SNS topic的filter key
+}
+
+// AWS SNS Client
+type BaseAWSSNSClient struct {
+	CF     AwsClientConfig
+	client *sns.Client
+}
+
+func NewBaseAWSClient(cf AwsClientConfig) (*BaseAWSSNSClient, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRegion(cf.Region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(cf.AccessKey, cf.SecretKey, "")),
+	)
+	if err != nil {
+		log.Fatalf("無法載入 SDK 設定: %v", err)
+	}
+	client := sns.NewFromConfig(cfg)
+	return &BaseAWSSNSClient{
+		CF:     cf,
+		client: client,
+	}, nil
 }
