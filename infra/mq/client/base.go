@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/google/uuid"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -146,11 +147,14 @@ func (b *BaseClient) reSet() error {
 }
 
 type AwsClientConfig struct {
-	Endpoint  string // ARN or URL
-	Region    string
-	AccessKey string
-	SecretKey string
-	FilterKey string // SNS topic的filter key
+	Endpoint            string // ARN or URL
+	Region              string
+	AccessKey           string
+	SecretKey           string
+	FilterKey           string // SNS topic的filter key
+	MaxNumberOfMessages int32  // SQS 一次最多抓幾封 (1-10)
+	WaitTimeSeconds     int32  // Long Polling: 沒信就等 20 秒
+	VisibilityTimeout   int32  // 拿到信後，30秒內別人看不到 (處理時間)
 }
 
 // AWS SNS Client
@@ -171,6 +175,29 @@ func NewBaseAWSClient(cf AwsClientConfig) (*BaseAWSSNSClient, error) {
 	}
 	client := sns.NewFromConfig(cfg)
 	return &BaseAWSSNSClient{
+		CF:     cf,
+		client: client,
+	}, nil
+}
+
+// AWS SNS Client
+type BaseAWSSQSClient struct {
+	CF     AwsClientConfig
+	client *sqs.Client
+}
+
+func NewBaseAWSSQSClient(cf AwsClientConfig) (*BaseAWSSQSClient, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cfg, err := config.LoadDefaultConfig(ctx,
+		config.WithRegion(cf.Region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(cf.AccessKey, cf.SecretKey, "")),
+	)
+	if err != nil {
+		log.Fatalf("無法載入 SDK 設定: %v", err)
+	}
+	client := sqs.NewFromConfig(cfg)
+	return &BaseAWSSQSClient{
 		CF:     cf,
 		client: client,
 	}, nil
