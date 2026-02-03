@@ -40,7 +40,7 @@ func NewAWSsqsConsumer(name string, cf AwsClientConfig) (*AWSsqsConsumer, error)
 //
 //	return:
 //	 	1. error
-func (c *AWSsqsConsumer) Consume(queueName string, handler func([]byte) error) error {
+func (c *AWSsqsConsumer) Consume(queueName, tag string, handler func([]byte) error) error {
 	if c.status.CompareAndSwap(int32(constant.ClientStop), int32(constant.ClientRunning)) {
 		go c.consume(queueName, handler)
 		return nil
@@ -95,7 +95,7 @@ func (c *AWSsqsConsumer) Close() error {
 	return nil
 }
 
-func (c *AWSsqsConsumer) ReStart(queueName string, handler func([]byte) error) error {
+func (c *AWSsqsConsumer) ReStart(queueName, tag string, handler func([]byte) error) error {
 	if c.status.CompareAndSwap(int32(constant.ClientStop), int32(constant.ClientRunning)) {
 		go c.consume(queueName, handler)
 		return nil

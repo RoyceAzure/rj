@@ -66,7 +66,7 @@ func TestAWSsqsConsumer_Consume(t *testing.T) {
 	}
 
 	// 開始消費（會啟動 goroutine）
-	err = consumer.Consume("", handler)
+	err = consumer.Consume("", "", handler)
 	require.NoError(t, err)
 
 	// 狀態應該變為 ClientRunning
@@ -95,7 +95,7 @@ func TestAWSsqsConsumer_ReStart(t *testing.T) {
 	}
 
 	// 重啟 consumer（會啟動 goroutine）
-	err = consumer.ReStart("", handler)
+	err = consumer.ReStart("", "", handler)
 	require.NoError(t, err)
 
 	// 狀態應該變為 ClientRunning
@@ -120,12 +120,12 @@ func TestAWSsqsConsumer_Consume_AlreadyRunning(t *testing.T) {
 	}
 
 	// 第一次 Consume，應該成功
-	err = consumer.Consume("", handler)
+	err = consumer.Consume("", "", handler)
 	require.NoError(t, err)
 	require.Equal(t, int32(constant.ClientRunning), consumer.status.Load())
 
 	// 第二次 Consume，應該不會改變狀態（因為已經在運行）
-	err = consumer.Consume("", handler)
+	err = consumer.Consume("", "", handler)
 	require.NoError(t, err)
 	require.Equal(t, int32(constant.ClientRunning), consumer.status.Load())
 
