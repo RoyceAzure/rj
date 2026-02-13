@@ -1,6 +1,6 @@
 module github.com/RoyceAzure/rj/repo
 
-go 1.23.3
+go 1.26
 
 require (
 	github.com/golang/mock v1.6.0

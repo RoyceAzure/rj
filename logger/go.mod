@@ -1,6 +1,6 @@
 module github.com/RoyceAzure/rj/logger
 
-go 1.23.3
+go 1.26
 
 require (
 	github.com/RoyceAzure/rj/infra v1.0.0
