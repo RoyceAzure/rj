@@ -90,7 +90,7 @@ func JSON(w http.ResponseWriter, status int, data any, options ...JSONOption) {
 // 這是 JSON 函數的便捷包裝，向後兼容
 // 錯誤處理：WriteHeader 已調用，錯誤時僅返回（不嘗試設置錯誤狀態）
 func JSONWithEscapeHTML(w http.ResponseWriter, status int, data any) {
-	JSON(w, status, data, 
+	JSON(w, status, data,
 		WithEscapeHTML(false),
 		WithErrorHandler(func(w http.ResponseWriter, err error) {
 			// 注意：WriteHeader 已經呼叫過，這裡若報錯通常只能記錄 Log
@@ -98,6 +98,7 @@ func JSONWithEscapeHTML(w http.ResponseWriter, status int, data any) {
 		}),
 	)
 }
+
 func ErrorJSON(w http.ResponseWriter, status int, err error, errMsg string) {
 	var details []string
 	if err != nil {
@@ -126,6 +127,39 @@ func SuccessJSON(w http.ResponseWriter, data any, metaData *MetaData) {
 // 不帶元數據的成功響應
 func SuccessJSONWithoutMeta(w http.ResponseWriter, data any) {
 	JSON(w, http.StatusOK, Response{
+		Success: true,
+		Data:    data,
+	})
+}
+
+func ErrorJSONWithEscapeHTML(w http.ResponseWriter, status int, err error, errMsg string) {
+	var details []string
+	if err != nil {
+		details = strings.Split(err.Error(), "\n")
+	}
+
+	JSONWithEscapeHTML(w, status, FailedResponse{
+		Success: false,
+		ResponseError: ResponseError{
+			Code:    status,
+			Message: &errMsg,
+			Details: details,
+		},
+	})
+}
+
+// 帶元數據的成功響應
+func SuccessJSONWithEscapeHTML(w http.ResponseWriter, data any, metaData *MetaData) {
+	JSONWithEscapeHTML(w, http.StatusOK, Response{
+		Success:  true,
+		MetaData: metaData,
+		Data:     data,
+	})
+}
+
+// 不帶元數據的成功響應
+func SuccessJSONWithoutMetaWithEscapeHTML(w http.ResponseWriter, data any) {
+	JSONWithEscapeHTML(w, http.StatusOK, Response{
 		Success: true,
 		Data:    data,
 	})
