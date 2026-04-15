@@ -100,7 +100,7 @@ func (p *ThreadSafeProducer) Publish(exchange, routingKey string, message []byte
 	return nil
 }
 
-func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte) error {
+func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte) (err error) {
 	// 檢查 channel 是否已關閉
 	select {
 	case <-p.done:
@@ -112,7 +112,12 @@ func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	err := p.channel.Publish(
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("internal producer panic: %v", r)
+		}
+	}()
+	err = p.channel.Publish(
 		exchange,   // exchange
 		routingKey, // routing key
 		false,      // mandatory
@@ -137,7 +142,7 @@ func (p *ThreadSafeProducer) publish(exchange, routingKey string, message []byte
 		return fmt.Errorf("producer %s_%s confirmation timeout", p.name, p.id)
 	}
 
-	return nil
+	return
 }
 
 func (p *ThreadSafeProducer) Start() {

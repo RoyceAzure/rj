@@ -41,6 +41,11 @@ func NewAWSProducer(name string, cf AwsClientConfig) (*AWSSNSProducer, error) {
 //
 //	error: 錯誤
 func (p *AWSSNSProducer) Publish(exchange, routingKey string, message []byte) error {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Panic recovered: %v", r)
+		}
+	}()
 	input := &sns.PublishInput{
 		Message:  aws.String(string(message)),
 		TopicArn: aws.String(p.CF.Endpoint),
@@ -57,8 +62,7 @@ func (p *AWSSNSProducer) Publish(exchange, routingKey string, message []byte) er
 	defer cancel()
 	result, err := p.client.Publish(ctx, input)
 	if err != nil {
-		log.Fatalf("發送失敗: %v", err)
-		return err
+		return fmt.Errorf("發送失敗: %v", err)
 	}
 	log.Printf("[Success] send message to AWS SNS %s, Message ID: %s, routingKey: %s, routingValue: %s", p.Name, *result.MessageId, p.CF.FilterKey, routingKey)
 	return nil

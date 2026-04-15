@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -171,7 +170,7 @@ func NewBaseAWSClient(cf AwsClientConfig) (*BaseAWSSNSClient, error) {
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(cf.AccessKey, cf.SecretKey, "")),
 	)
 	if err != nil {
-		log.Fatalf("無法載入 SDK 設定: %v", err)
+		return nil, fmt.Errorf("無法載入 SDK 設定: %v", err)
 	}
 	client := sns.NewFromConfig(cfg)
 	return &BaseAWSSNSClient{
@@ -194,7 +193,7 @@ func NewBaseAWSSQSClient(cf AwsClientConfig) (*BaseAWSSQSClient, error) {
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(cf.AccessKey, cf.SecretKey, "")),
 	)
 	if err != nil {
-		log.Fatalf("無法載入 SDK 設定: %v", err)
+		return nil, fmt.Errorf("無法載入 SDK 設定: %v", err)
 	}
 	client := sqs.NewFromConfig(cfg)
 	return &BaseAWSSQSClient{

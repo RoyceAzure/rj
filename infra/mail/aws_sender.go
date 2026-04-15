@@ -2,7 +2,7 @@ package mail
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -30,7 +30,7 @@ func NewAwsEmailSender(cf AwsEmailSenderConfig) (*AwsEmailSender, error) {
 		config.WithRegion(cf.Region),
 	)
 	if err != nil {
-		log.Fatalf("無法載入 AWS 設定: %v", err)
+		return nil, fmt.Errorf("無法載入 AWS 設定: %v", err)
 	}
 	client := ses.NewFromConfig(cfg)
 	return &AwsEmailSender{
