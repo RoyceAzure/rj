@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/o1egl/paseto v1.0.0
 	github.com/stretchr/testify v1.2.2
-	google.golang.org/grpc v1.70.0
+	google.golang.org/grpc v1.79.3
 )
 
 require github.com/golang-jwt/jwt/v5 v5.3.1
@@ -19,6 +19,6 @@ require (
 	github.com/goccy/go-json v0.10.5
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 )
