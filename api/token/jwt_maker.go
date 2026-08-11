@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const minSecretSize = 32
@@ -46,12 +46,11 @@ func (maker *JWTMaker[T]) VertifyToken(token string) (*Payload[T], error) {
 		}
 		return []byte(maker.secretKey), nil
 	}
-	//ParseWithClaims會使用我們提供的keyfunc與claim Valid()做驗證  且是回傳我們自訂的錯誤
-	//且他返回的錯誤訊息會使用自己的格式包起來，所以我們必須拆解  才知道真正的錯誤是哪個
+	//ParseWithClaims會使用我們提供的keyfunc  並根據claim的GetExpirationTime()等方法自動驗證
+	//v5會回傳包裝過的sentinel error  用errors.Is判斷實際錯誤種類
 	jwtToken, err := jwt.ParseWithClaims(token, &Payload[T]{}, keyFunc)
 	if err != nil {
-		verr, ok := err.(*jwt.ValidationError)
-		if ok && errors.Is(verr.Inner, ErrExpiredToken) {
+		if errors.Is(err, jwt.ErrTokenExpired) {
 			return nil, ErrExpiredToken
 		}
 		return nil, ErrInvalidToken

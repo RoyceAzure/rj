@@ -4,12 +4,13 @@ go 1.26
 
 require (
 	github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/o1egl/paseto v1.0.0
 	github.com/stretchr/testify v1.2.2
 	google.golang.org/grpc v1.70.0
 )
+
+require github.com/golang-jwt/jwt/v5 v5.3.1
 
 require (
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
